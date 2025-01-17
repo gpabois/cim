@@ -72,11 +72,14 @@ export function AiotEquipe(props: AiotEquipeProps) {
     {isNone(mode) && <StackedList>
       {aiot.équipe.map((contact, index) => ({
         key: contact.nom,
-        content: <div className="flex flex-row">
-          <span>{`${contact.prénom ? "" : `${contact.prénom} `}${contact.nom} - ${contact.fonction}`}</span>
+        content: <div className="flex flex-row space-x-2">
+          <span>{contact.genre == "homme" && "M." }{contact.genre == "femme" && "Mme."} {`${contact.prénom ? `${contact.prénom} ` : ""}${contact.nom} - ${contact.fonction}`}</span>
           <Button theme="barebone" size="sm" onClick={() => setMode({kind: "Edition", index})}><BiEdit/></Button>
         </div>,
-        subcontent: `${contact.courriel}`
+        subcontent: <div className="flex space-x-2 items-center">
+          {contact.courriel && <span>@: <a href={`mailto:${contact.courriel}`}>{contact.courriel}</a></span>}
+          {contact.téléphone && <span>Tél: {contact.téléphone}</span>}
+        </div>
       }))}
     </StackedList>
     }
@@ -146,7 +149,6 @@ export function AiotDetails() {
                   <Link to="/aiots">AIOTS</Link>
                   <span>{aiot.nom}</span>
                 </Breadcrumbs>
-                // Infos générales
                 <DescriptionList>
                   {{
                     title: aiot.nom,

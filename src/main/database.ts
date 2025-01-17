@@ -225,7 +225,7 @@ export function transformUpdator<T>(updator: Updator<T>): (old: T) => T {
         return Object.entries(updator.$setArrayElement!).reduce((acc, [k, v]) => {
           let path = k.split('.');
           let index = parseInt(path.pop()!);
-          return R.modifyPath(path, (arr) => arr[index] = v, acc);
+          return R.modifyPath(path, (arr) => {arr[index] = v; return arr}, acc);
         }, newValue)
       })
     }
