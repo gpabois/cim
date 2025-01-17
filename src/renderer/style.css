@@ -1,0 +1,13 @@
+@config "./tailwind.config.js";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.titlebar {
+    -webkit-app-region: drag
+}
+
+.titlebar > * {
+    -webkit-app-region: no-drag;
+}
