@@ -6,11 +6,11 @@ import { EntityTypes } from "@interface/model/index";
 import { OrganismeDeControleTypes } from "@interface/model/organismes_de_controle";
 import { ServiceTypes } from "@interface/model/services";
 import { Filter, UpdatorBuilder } from "@interface/query";
-import {Crud} from "@interface/types";
+import { Crud } from "@interface/types";
 
 function registerCrud<
-  Types extends EntityTypes, 
-  Prefix extends keyof Window['cim']=any
+  Types extends EntityTypes,
+  Prefix extends keyof Window['cim'] = any
 >(prefix: Prefix): Crud<Types> {
   return window.cim[prefix] as Crud<Types>;
 }

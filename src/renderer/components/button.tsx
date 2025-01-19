@@ -1,9 +1,9 @@
 export interface ButtonProps {
-    onClick?: () => void;
-    children: React.ReactNode;
-    className?: string
-    size?: "lg" | "md" | "sm"
-    theme?: "primary" | "danger" | "barebone" | "quick"
+  onClick?: () => void;
+  children: React.ReactNode;
+  className?: string
+  size?: "lg" | "md" | "sm"
+  theme?: "primary" | "danger" | "barebone" | "quick"
 }
 
 export const buttonSizes = {
@@ -21,11 +21,11 @@ export const buttonThemes = {
 
 export function Button(props: ButtonProps) {
   const className = `font-medium ${props.className || ""} ${buttonSizes[props.size || "md"]} ${buttonThemes[props.theme || 'primary']}`
-  
-  return <button 
-    onClick={props.onClick} 
-    type="button" 
+
+  return <button
+    onClick={props.onClick}
+    type="button"
     className={className}>
-      {props.children}
+    {props.children}
   </button>
 }

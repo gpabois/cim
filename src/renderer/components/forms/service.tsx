@@ -2,24 +2,24 @@ import { guardCurrentProject } from "@app/guards/project";
 import { AsyncSelect, Input } from "../form";
 import { FormProvider, SubmitHandler, useForm, useFormContext } from "react-hook-form";
 import { useYupValidationResolver } from "@app/hooks";
-import { ServiceCreation, serviceCreationSchema } from "@interface/model/services";
-import { Button } from "../button";
+import { ServiceCreation, serviceCreationSchema, ServiceTypes } from "@interface/model/services";
+import { useTranslation } from "react-i18next";
 
 export interface SelectServiceProps {
   name: string,
-  onChange?: (Service) => void,
+  onChange?: (service: ServiceTypes["id"]) => void,
   label?: string
 }
 
 export function SelectService(props: SelectServiceProps) {
   const project = guardCurrentProject();
-  const {register} = useFormContext();
+  const { register } = useFormContext();
   const fetch = async (search: string) => {
     return await window.cim.services.list(project.id, {
       filter: {
         $or: [
-          {id: {$like: search}}, 
-          {nom: {$like: search}}
+          { id: { $like: search } },
+          { nom: { $like: search } }
         ]
       }
     })
@@ -28,8 +28,8 @@ export function SelectService(props: SelectServiceProps) {
   return <AsyncSelect
     {...register(props.name)}
     label={props.label}
-    loadOptions={fetch} 
-    transform={({id: value, nom: label}) => ({label, value})}
+    loadOptions={fetch}
+    transform={({ id: value, nom: label }) => ({ label, value })}
   />
 }
 
@@ -39,15 +39,18 @@ export interface ServiceCreationFormProps {
 }
 
 export function ServiceCreationForm(props: ServiceCreationFormProps) {
-    const resolver = useYupValidationResolver(serviceCreationSchema);
-    const methods = useForm<ServiceCreation>({resolver, defaultValues: props.defaultValues});
-    const {register, handleSubmit, trigger} = methods;
+  const { t } = useTranslation();
+  const resolver = useYupValidationResolver(serviceCreationSchema);
+  const methods = useForm<ServiceCreation>({ resolver, defaultValues: props.defaultValues });
+  const { register, handleSubmit } = methods;
 
-    return <FormProvider {...methods}>
-      <form onSubmit={props.onSubmit && handleSubmit(props.onSubmit)}>
-        <Input label="Nom" {...register("nom")} />
-        <Button className="w-full" onClick={trigger}>Enregistrer</Button>
-      </form>
-    </FormProvider>
+  const submit = (service: ServiceCreation) => props.onSubmit?.(service);
+
+  return <FormProvider {...methods}>
+    <form onSubmit={handleSubmit(submit)} className="space-y-2">
+      <Input label="Nom" {...register("nom")} />
+      <Input type="button" value={t("Save")}></Input>
+    </form>
+  </FormProvider>
 }
 

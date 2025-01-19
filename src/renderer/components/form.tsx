@@ -23,14 +23,14 @@ export function AsyncSelect<T extends FieldValues, V>(props: UseControllerProps<
   return <>
   <Option 
     value={props.label} 
-    onSome={(label) => <label htmlFor={props.name} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+    onSome={(label) => <label htmlFor={props.name} className="mb-2 text-sm font-medium text-gray-900">
         {label}
     </label>}
   />
   <AsyncForeignSelect<{label: string, value: V}>
     classNames={{
       container: (_) => 'rounded-md',
-      valueContainer: (_) => 'text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+      valueContainer: (_) => 'text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 '
     }}
     {...field} 
     loadOptions={loadOptions}
@@ -49,7 +49,7 @@ export function Select<V, T=V>(props: UseControllerProps & SelectProps<V, T>) {
   return <>
     <Option 
       value={props.label} 
-      onSome={(label) => <label htmlFor={props.name} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+      onSome={(label) => <label htmlFor={props.name} className="mb-2 text-sm font-medium text-gray-900">
           {label}
       </label>}
     />
@@ -83,10 +83,10 @@ export const Input =  forwardRef<HTMLInputElement, Partial<UseFormRegisterReturn
     return <>
           <input 
             ref={ref} 
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" 
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" 
             {...props} 
           />
-          {props.label && <label htmlFor={props.id} className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{props.label}</label>}
+          {props.label && <label htmlFor={props.id} className="ms-2 text-sm font-medium text-gray-900">{props.label}</label>}
     </>;
   }
 
@@ -98,7 +98,7 @@ export const Input =  forwardRef<HTMLInputElement, Partial<UseFormRegisterReturn
   return <div className={props.className}>
       <Option 
           value={props.label} 
-          onSome={(label) => <label htmlFor={props.id} className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          onSome={(label) => <label htmlFor={props.id} className="mb-2 text-sm font-medium text-gray-900">
               {label}
           </label>}
       />
@@ -106,9 +106,9 @@ export const Input =  forwardRef<HTMLInputElement, Partial<UseFormRegisterReturn
           <input 
             ref={ref} 
             {...props} 
-            className={`${(props.buttons?.length || 0) == 0 ? "rounded-lg": "rounded-none rounded-s-lg"}  bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`} 
+            className={`${(props.buttons?.length || 0) == 0 ? "rounded-lg": "rounded-none rounded-s-lg"}  bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5`} 
           />
-          {props.buttons?.map((btn) => <button key={btn.key} onClick={(_) => btn?.onClick?.()} className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-e-0 border-gray-300 rounded-e-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+          {props.buttons?.map((btn) => <button key={btn.key} onClick={(_) => btn?.onClick?.()} className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-e-0 border-gray-300 rounded-e-md">
               {btn.content}
           </button>)}
       </div>
@@ -132,7 +132,7 @@ export function MultiInput(props: UseControllerProps & MultiInputProps) {
   const defaultFn: () => string = props.defaultFn || (() => "");
 
   return <>
-    <div className='flex mb-2 text-sm font-medium text-gray-900 dark:text-white'>
+    <div className='flex mb-2 text-sm font-medium text-gray-900'>
       <Option 
         value={props.label} 
         onSome={(label) => <label htmlFor={props.name} className="flex-1"> 

@@ -7,6 +7,7 @@ import { AiotCreation, aiotCreationSchema } from "@interface/model/aiots";
 import { FieldValues, FormProvider, SubmitHandler, UseControllerProps, useForm, UseFormProps, useWatch } from "react-hook-form";
 import { Button } from "../button";
 import { useYupValidationResolver } from "@app/hooks";
+import { useTranslation } from "react-i18next";
 
 export interface AiotSelectionProps {
   label?: string
@@ -18,8 +19,8 @@ export function SelectAiot<T extends FieldValues>(props: UseControllerProps<T> &
     return await window.cim.aiots.list(project.id, {
       filter: {
         $or: [
-          {codeAiot: {$like: search}}, 
-          {nom: {$like: search}}
+          { codeAiot: { $like: search } },
+          { nom: { $like: search } }
         ]
       }
     })
@@ -28,8 +29,8 @@ export function SelectAiot<T extends FieldValues>(props: UseControllerProps<T> &
   return <AsyncSelect
     name={props.name}
     label={props.label}
-    loadOptions={fetchAiots} 
-    transform={(aiot) => ({label: `${aiot.nom} (${aiot.codeAiot})`, value: aiot})}
+    loadOptions={fetchAiots}
+    transform={(aiot) => ({ label: `${aiot.nom} (${aiot.codeAiot})`, value: aiot })}
   />
 }
 
@@ -38,34 +39,35 @@ export interface AiotCreationFormProps {
 }
 
 export function AiotCreationForm(props: AiotCreationFormProps & UseFormProps<AiotCreation>) {
+  const { t } = useTranslation();
   const resolver = useYupValidationResolver(aiotCreationSchema);
-  const methods = useForm<AiotCreation>({resolver, defaultValues: props.defaultValues});
-  const {register, control, setValue, handleSubmit, trigger} = methods;
+  const methods = useForm<AiotCreation>({ resolver, defaultValues: props.defaultValues });
+  const { register, control, setValue, handleSubmit, trigger } = methods;
 
   /// Précharge le formulaire à partir du code aiot depuis Géorisques.
-  const prefillFromGeorisques = async (codeAiot: Optional<string>) => {
+  const completeFromGeorisques = async (codeAiot: Optional<string>) => {
     if (isNone(codeAiot)) {
-        return;
+      return;
     }
 
     const resp = await axios.get(`https://georisques.gouv.fr/api/v1/installations_classees`, {
-        params: {
-            page: 1,
-            page_size: 10,
-            codeAIOT: codeAiot
-        }
+      params: {
+        page: 1,
+        page_size: 10,
+        codeAIOT: codeAiot
+      }
     });
 
     const results = resp.data.data;
-    
-    if(results.length > 0) {
+
+    if (results.length > 0) {
       const result = results[0];
-      
+
       setValue("adresse", {
         lines: [
-            result.adresse1, 
-            result.adresse2, 
-            result.adresse3
+          result.adresse1,
+          result.adresse2,
+          result.adresse3
         ].filter((line) => isSome(line) && line.length > 0),
         commune: result.commune,
         codePostal: result.codePostal
@@ -75,23 +77,23 @@ export function AiotCreationForm(props: AiotCreationFormProps & UseFormProps<Aio
     }
   }
 
-  const codeAiot = useWatch({control, name: "codeAiot", defaultValue: ""});
+  const codeAiot = useWatch({ control, name: "codeAiot", defaultValue: "" });
 
   return <FormProvider {...methods}>
     <form onSubmit={props.onSubmit && handleSubmit(props.onSubmit)}>
       <Input label="Code AIOT" {...register("codeAiot")}
         buttons={[
           {
-            key: "prefill-from-georisques",
-            content: "Pré-remplir depuis Géorisques",
-            onClick: () => prefillFromGeorisques(codeAiot)
+            key: "complete-from-georisques",
+            content: t("CompleteFromGeorisques"),
+            onClick: () => completeFromGeorisques(codeAiot)
           }
         ]}
       />
 
       <Input label="Raison sociale" {...register("nom")} />
-      <AdresseField label="Adresse de l'établissement" name="adresse"/>
-      <Button className="w-full" onClick={trigger}>Enregistrer</Button>
+      <AdresseField label="Adresse de l'établissement" name="adresse" />
+      <Button className="w-full" onClick={trigger}>{t("Save")}</Button>
     </form>
   </FormProvider>
 }

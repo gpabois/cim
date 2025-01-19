@@ -21,9 +21,6 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
-    titleBarStyle: "hidden",
-    titleBarOverlay: {    color: '#2f3241',    symbolColor: '#74b1be'  },
-    frame: false,
     webPreferences: {
       preload: path.join(__dirname, "../preload/index.mjs"),
       sandbox: false
@@ -34,15 +31,15 @@ function createWindow() {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'), {hash: "/"})
+    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'), { hash: "/" })
   }
 }
 
 
 app.whenReady().then(() => {
-  installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS],  { loadExtensionOptions: { allowFileAccess: true } })
-      .then(([redux, react]) => console.log(`Added Extensions:  ${redux.name}, ${react.name}`))
-      .catch((err) => console.log('An error occurred: ', err));
+  installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], { loadExtensionOptions: { allowFileAccess: true } })
+    .then(([redux, react]) => console.log(`Added Extensions:  ${redux.name}, ${react.name}`))
+    .catch((err) => console.log('An error occurred: ', err));
 });
 
 export interface CrudHandlers<E extends EntityTypes> {
@@ -72,7 +69,7 @@ function registerCrud<Types extends EntityTypes>(args: CrudHandlers<Types>) {
   ipcMain.handle(`${args.prefix}.get`, async (_event: any, projectId: ProjectId, id: string) => {
     let project = Project.get(projectId)!;
     let col = project?.db.getCollection<Types['fields']>(args.colName)!;
-    let maybeEntity = await col.findOneBy({[args.id]: id});
+    let maybeEntity = await col.findOneBy({ [args.id]: id });
     if (isSome(maybeEntity)) {
       return await args.hydrateData(project, maybeEntity)
     }
@@ -92,7 +89,7 @@ function registerCrud<Types extends EntityTypes>(args: CrudHandlers<Types>) {
 app.whenReady().then(async () => {
   createWindow();
 
-  app.on("activate", function () {
+  app.on("activate", function() {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -118,8 +115,8 @@ app.whenReady().then(async () => {
       message: "Créer le répertoire racine",
       properties: ["openDirectory"]
     });
-    
-    if(dir?.length || 0 > 0) {
+
+    if (dir?.length || 0 > 0) {
       return await Project.open(dir![0])
     }
 
@@ -130,13 +127,13 @@ app.whenReady().then(async () => {
     let filepath = dialog.showSaveDialogSync({
       title: "Document généré",
       message: "Emplacement où sera stocké le document ainsi généré",
-      filters: [{extensions: [".docx"], name: "Document Word"}]
+      filters: [{ extensions: [".docx"], name: "Document Word" }]
     });
 
     let project = Project.get(id);
     const bytes = await project?.generateDocumentFromTemplate(name, data);
-    
-    if(isSome(bytes)) {
+
+    if (isSome(bytes)) {
       await fs.writeFile(filepath, bytes);
     }
 
@@ -151,7 +148,7 @@ app.whenReady().then(async () => {
       return {
         ...aiot,
         département: aiot.adresse.codePostal.slice(0, 2)
-      } 
+      }
     }
   });
 
@@ -162,7 +159,7 @@ app.whenReady().then(async () => {
     async onCreate(_, creation) {
       const id = `${snowflake.nextId()}`;
       return {
-        id, 
+        id,
         ...creation
       }
     },
