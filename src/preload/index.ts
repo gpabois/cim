@@ -10,10 +10,12 @@ import { ServiceTypes } from '@interface/model/services';
 
 export function registerCrud<Types extends EntityTypes>(prefix: string): Crud<Types> {
  return {
-    create: (project: ProjectId, nouveau: Types['creation']) => ipcRenderer.invoke(`${prefix}.new`, project, nouveau),
-    list: (projectId: ProjectId, query: SerChunkQuery<Types['fields']>) => ipcRenderer.invoke(`${prefix}.list`, projectId, query),
-    get: (projectId: ProjectId, id: Types['id']) => ipcRenderer.invoke(`${prefix}.get`, projectId, id),
-    update: (projectId: ProjectId, predicate: Filter<Types['fields']>, updator: Updator<Types['fields']>) => ipcRenderer.invoke(`${prefix}.update`, projectId, predicate, updator)
+    create: (project: ProjectId, nouveau: Types['creation']) => ipcRenderer.invoke(`cim.${prefix}.create`, project, nouveau),
+    list: (projectId: ProjectId, query: SerChunkQuery<Types['fields']>) => ipcRenderer.invoke(`cim.${prefix}.list`, projectId, query),
+    get: async (projectId: ProjectId, id: Types['id']) => {
+      return await ipcRenderer.invoke(`cim.${prefix}.get`, projectId, id);
+    },
+    update: (projectId: ProjectId, predicate: Filter<Types['fields']>, updator: Updator<Types['fields']>) => ipcRenderer.invoke(`cim.${prefix}.update`, projectId, predicate, updator)
   }
 }
 
@@ -24,19 +26,19 @@ contextBridge.exposeInMainWorld('cim', {
       }
     },
     services: {
-      ...registerCrud<ServiceTypes>('cim.services')
+      ...registerCrud<ServiceTypes>('services')
     },
     project: {
         open: (): Promise<ProjectId> => ipcRenderer.invoke('cim.project.open'),
         new: (): Promise<ProjectId> => ipcRenderer.invoke('cim.project.new'),
     },
     aiots: {
-      ...registerCrud<AiotTypes>("cim.aiots")
+      ...registerCrud<AiotTypes>("aiots")
     },
     controles: {
-      ...registerCrud<ControleTypes>("cim.controles")
+      ...registerCrud<ControleTypes>("controles")
     },
     organismeDeControles: {
-      ...registerCrud<OrganismeDeControleTypes>("cim.organismesDeControle")
+      ...registerCrud<OrganismeDeControleTypes>("organismesDeControle")
     }
 })

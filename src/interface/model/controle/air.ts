@@ -1,4 +1,5 @@
 import { BaseControleFields, defaultBaseControleCreation } from ".";
+import { AiotTypes } from "../aiots";
 import { Condition, defaultCondition } from "../condition";
 import { Paramètre } from "../paramètre";
 
@@ -9,7 +10,9 @@ export interface ControleAirFields extends BaseControleFields {
 export type ControleAirCreation = Omit<ControleAirFields, "id">;
 
 export interface ControleAirData extends BaseControleFields {
-
+  nom: string,
+  aiot: AiotTypes['data'],
+  points: Array<PointDeControleAir>
 }
 
 export function defaultControleAirCreation(): ControleAirCreation {

@@ -1,9 +1,11 @@
 export interface BreadcrumbProps {
-  children: Array<React.ReactNode> | React.ReactNode
+  children: Array<React.ReactNode> | React.ReactNode,
+  className?: string
 }
 export function Breadcrumbs(props: BreadcrumbProps) {
   const children = Array.isArray(props.children) ? props.children : [props.children];
-  return <ol className="flex items-center whitespace-nowrap pb-2 text-sm font-semibold text-gray-600">
+  const className = ["flex items-center whitespace-nowrap pb-2 text-sm font-semibold text-gray-600", props.className || ""].join(" ");
+  return <ol className={className}>
     {Array.from(children.entries()).map(([i, step]) => [i, i == children.length - 1, step]).map(([i, isLast, step]) => (
         <li key={`${i}`} className="inline-flex items-center">
           {step}

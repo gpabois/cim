@@ -2,20 +2,22 @@ import {forwardRef, JSX} from 'react';
 import { Option } from './option';
 import ForeignSelect from 'react-select'
 import AsyncForeignSelect from 'react-select/async';
-import { FieldValues, useController, UseControllerProps, useFieldArray, UseFormRegisterReturn } from 'react-hook-form';
+import { Controller, useController, UseControllerProps, useFieldArray, useFormContext, UseFormRegisterReturn } from 'react-hook-form';
 import { useScopedFormContext } from '@app/hooks';
-import { ButtonProps, buttonSizes, buttonThemes } from './button';
+import { Button, ButtonProps, buttonSizes, buttonThemes } from './button';
+import { BiAddToQueue } from 'react-icons/bi';
 
-export interface AsyncSelectProps<V, T=any> {
+export interface AsyncSelectProps<T, V> {
   label?: string,
+  name: string,
   loadOptions: (inputValue: string) => Promise<Array<T>>,
   transform: (item: T) => {label: string, value: V}
 }
 
-export function AsyncSelect<T extends FieldValues, V>(props: UseControllerProps<T> & AsyncSelectProps<V>) {
-  const { field } = useController(props);
+export function AsyncSelect<T, V>(props: AsyncSelectProps<T, V>) {
+  const { control } = useFormContext()
 
-  const loadOptions = async (inputValue: string) => {
+  const loadOptions = async (inputValue: string): Promise<Array<{label: string, value: V}>> => {
     const items = await props.loadOptions(inputValue);
     return items.map(props.transform)
   }
@@ -27,13 +29,18 @@ export function AsyncSelect<T extends FieldValues, V>(props: UseControllerProps<
         {label}
     </label>}
   />
-  <AsyncForeignSelect<{label: string, value: V}>
-    classNames={{
-      container: (_) => 'rounded-md',
-      valueContainer: (_) => 'text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 '
-    }}
-    {...field} 
-    loadOptions={loadOptions}
+  <Controller
+    name={props.name}
+    control={control}
+    render={({field}) => <AsyncForeignSelect<{label: string, value: V}>
+      classNames={{
+        container: (_) => 'rounded-md',
+        valueContainer: (_) => 'text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 '
+      }}
+      {...field} 
+      onChange={(v) => field.onChange(v?.value)}
+      loadOptions={loadOptions}
+    />}
   />
 </>
 }
@@ -59,6 +66,7 @@ export function Select<V, T=V>(props: UseControllerProps & SelectProps<V, T>) {
         valueContainer: (_) => 'text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
       }}
       {...field}
+      onChange={(v) => field.onChange(v?.value)}
       options={props.options.map(props.transform)}>
     </ForeignSelect>
   </>
@@ -139,7 +147,7 @@ export function MultiInput(props: UseControllerProps & MultiInputProps) {
             {label}
         </label>}
       />
-      <button onClick={(_) => append(defaultFn())}>Ajouter</button>
+      <Button theme='barebone' onClick={() => append(defaultFn())}><BiAddToQueue/></Button>
     </div>
     <div className='space-y-2 border border-gray-200 rounded-md p-2'>
       {fields.map((field, index) => 

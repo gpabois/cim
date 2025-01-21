@@ -35,5 +35,10 @@ export default {
   },
   services: registerCrud<ServiceTypes>('services'),
   organismesDeControle: registerCrud<OrganismeDeControleTypes>('organismesDeControle'),
-  controles: registerCrud<ControleTypes>('controles')
+  controles: registerCrud<ControleTypes>('controles'),
+  template: {
+    async generateAndSave<T>(project: ProjectId, name: string, data: T): Promise<void> {
+      await window.cim.template.generateAndSave(project, name, data)
+    }
+  }
 }

@@ -5,18 +5,18 @@ import { AdresseField } from "./adresse";
 import { guardCurrentProject } from "@app/guards/project";
 import { AiotCreation, aiotCreationSchema } from "@interface/model/aiots";
 import { FieldValues, FormProvider, SubmitHandler, UseControllerProps, useForm, UseFormProps, useWatch } from "react-hook-form";
-import { Button } from "../button";
 import { useYupValidationResolver } from "@app/hooks";
 import { useTranslation } from "react-i18next";
+import api from "@app/api";
 
 export interface AiotSelectionProps {
   label?: string
 }
-export function SelectAiot<T extends FieldValues>(props: UseControllerProps<T> & AiotSelectionProps) {
-  const project = guardCurrentProject();
+export function SelectAiotId<T extends FieldValues>(props: UseControllerProps<T> & AiotSelectionProps) {
+  const {id: projectId} = guardCurrentProject();
 
-  const fetchAiots = async (search: string) => {
-    return await window.cim.aiots.list(project.id, {
+  const fetch = async (search: string) => {
+    return await api.aiots.list(projectId, {
       filter: {
         $or: [
           { codeAiot: { $like: search } },
@@ -29,8 +29,8 @@ export function SelectAiot<T extends FieldValues>(props: UseControllerProps<T> &
   return <AsyncSelect
     name={props.name}
     label={props.label}
-    loadOptions={fetchAiots}
-    transform={(aiot) => ({ label: `${aiot.nom} (${aiot.codeAiot})`, value: aiot })}
+    loadOptions={fetch}
+    transform={(aiot) => ({ label: `${aiot.nom} (${aiot.codeAiot})`, value: aiot.codeAiot })}
   />
 }
 
@@ -42,7 +42,7 @@ export function AiotCreationForm(props: AiotCreationFormProps & UseFormProps<Aio
   const { t } = useTranslation();
   const resolver = useYupValidationResolver(aiotCreationSchema);
   const methods = useForm<AiotCreation>({ resolver, defaultValues: props.defaultValues });
-  const { register, control, setValue, handleSubmit, trigger } = methods;
+  const { register, control, setValue, handleSubmit } = methods;
 
   /// Précharge le formulaire à partir du code aiot depuis Géorisques.
   const completeFromGeorisques = async (codeAiot: Optional<string>) => {
@@ -79,8 +79,11 @@ export function AiotCreationForm(props: AiotCreationFormProps & UseFormProps<Aio
 
   const codeAiot = useWatch({ control, name: "codeAiot", defaultValue: "" });
 
+  const submit = (form) => props.onSubmit?.(form);
+
   return <FormProvider {...methods}>
-    <form onSubmit={props.onSubmit && handleSubmit(props.onSubmit)}>
+    <form onSubmit={handleSubmit(submit)} className="space-y-2">
+      {JSON.stringify(methods.formState.errors)}
       <Input label="Code AIOT" {...register("codeAiot")}
         buttons={[
           {
@@ -93,7 +96,7 @@ export function AiotCreationForm(props: AiotCreationFormProps & UseFormProps<Aio
 
       <Input label="Raison sociale" {...register("nom")} />
       <AdresseField label="Adresse de l'établissement" name="adresse" />
-      <Button className="w-full" onClick={trigger}>{t("Save")}</Button>
+      <Input className="w-full" type="submit" value={t("Save")}></Input>
     </form>
   </FormProvider>
 }

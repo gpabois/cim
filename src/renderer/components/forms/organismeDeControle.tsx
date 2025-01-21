@@ -12,7 +12,7 @@ export function OrganismeDeControleCreationForm(props: OrganismeDeControleCreati
   const methods = useForm<OrganismeDeControleCreation>({defaultValues: props.defaultValues});
   const {register, handleSubmit, trigger} = methods;
   return <FormProvider {...methods}>
-      <form onSubmit={props.onSubmit && handleSubmit(props.onSubmit)}>
+      <form onSubmit={props.onSubmit && handleSubmit(props.onSubmit)} className="space-y-2">
       <Form.Input label="Nom" {...register("nom")}/>
       <AdresseField name="adresse"/>
       <Button className="w-full" onClick={trigger}>Enregistrer</Button>

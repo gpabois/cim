@@ -1,4 +1,4 @@
-export type Optional<T> = T | undefined | null;
+export type Optional<T=any> = T | undefined | null;
 
 export const None = undefined;
 

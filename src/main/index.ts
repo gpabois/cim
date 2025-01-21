@@ -35,9 +35,8 @@ function createWindow() {
   }
 }
 
-
 app.whenReady().then(() => {
-  installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], { loadExtensionOptions: { allowFileAccess: true } })
+  installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], { loadExtensionOptions: { allowFileAccess: true }, forceDownload: true })
     .then(([redux, react]) => console.log(`Added Extensions:  ${redux.name}, ${react.name}`))
     .catch((err) => console.log('An error occurred: ', err));
 });
@@ -51,22 +50,22 @@ export interface CrudHandlers<E extends EntityTypes> {
 }
 
 function registerCrud<Types extends EntityTypes>(args: CrudHandlers<Types>) {
-  ipcMain.handle(`${args.prefix}.create`, async (_event: any, id: ProjectId, creation: Types['creation']) => {
+  ipcMain.handle(`cim.${args.prefix}.create`, async (_event: any, id: ProjectId, creation: Types['creation']) => {
     let project = Project.get(id)!;
     let col = project?.db.getCollection<Types['fields']>(args.colName);
     let insert = await args.onCreate(project, creation);
-    await col?.insert(insert);
+    col?.insert(insert);
     return insert[args.id];
   });
 
-  ipcMain.handle(`${args.prefix}.list`, async (_event: any, projectId: ProjectId, query: SerChunkQuery<Types['fields']>) => {
+  ipcMain.handle(`cim.${args.prefix}.list`, async (_event: any, projectId: ProjectId, query: SerChunkQuery<Types['fields']>) => {
     let project = Project.get(projectId)!;
     let col = project?.db.getCollection<Types['fields']>(args.colName)!;
     let rows = [...col.findBy(query)];
     return await Promise.all(rows?.map(R.partial(args.hydrateData, [project])));
   });
 
-  ipcMain.handle(`${args.prefix}.get`, async (_event: any, projectId: ProjectId, id: string) => {
+  ipcMain.handle(`cim.${args.prefix}.get`, async (_event: any, projectId: ProjectId, id: string) => {
     let project = Project.get(projectId)!;
     let col = project?.db.getCollection<Types['fields']>(args.colName)!;
     let maybeEntity = await col.findOneBy({ [args.id]: id });
@@ -76,7 +75,7 @@ function registerCrud<Types extends EntityTypes>(args: CrudHandlers<Types>) {
     return None;
   });
 
-  ipcMain.handle(`${args.prefix}.update`, async (_event: any, projectId: ProjectId, filter: Filter<Types['fields']>, updator: Updator<Types['fields']>) => {
+  ipcMain.handle(`cim.${args.prefix}.update`, async (_event: any, projectId: ProjectId, filter: Filter<Types['fields']>, updator: Updator<Types['fields']>) => {
     let project = Project.get(projectId);
     let col = project?.db.getCollection<Types['fields']>(args.colName)!;
     await col.update(filter, updator);
@@ -127,7 +126,7 @@ app.whenReady().then(async () => {
     let filepath = dialog.showSaveDialogSync({
       title: "Document généré",
       message: "Emplacement où sera stocké le document ainsi généré",
-      filters: [{ extensions: [".docx"], name: "Document Word" }]
+      filters: [{ extensions: ["docx"], name: "Document Word" }]
     });
 
     let project = Project.get(id);
@@ -139,22 +138,38 @@ app.whenReady().then(async () => {
 
   })
 
+  const hydrateAiotData = async (_: Project, aiot: AiotTypes['fields']): Promise<AiotTypes['data']> => {
+    return {
+      ...aiot,
+      département: aiot.adresse.codePostal.slice(0, 2)
+    }
+  }
+
+  const hydrateControleData = async (project: Project, controle: ControleTypes['fields']): Promise<ControleTypes['data']> => {
+    const aiots = project.db.getCollection<AiotTypes['fields']>('aiots');
+    const aiot = await hydrateAiotData(
+      project,
+      await aiots.findOneBy({codeAiot: controle.codeAiot})!
+    );
+
+    return {
+      ...controle, 
+      nom: `${controle.année} - ${aiot.nom} (#${aiot.codeAiot})`,
+      aiot
+    }
+  }
+
   registerCrud<AiotTypes>({
     id: "codeAiot",
-    prefix: "cim.aiots",
+    prefix: "aiots",
     colName: "aiots",
     onCreate: async (_, creation) => creation,
-    hydrateData: async (_, aiot) => {
-      return {
-        ...aiot,
-        département: aiot.adresse.codePostal.slice(0, 2)
-      }
-    }
+    hydrateData: hydrateAiotData
   });
 
   registerCrud<ServiceTypes>({
     id: "id",
-    prefix: "cim.services",
+    prefix: "services",
     colName: "services",
     async onCreate(_, creation) {
       const id = `${snowflake.nextId()}`;
@@ -171,22 +186,25 @@ app.whenReady().then(async () => {
 
   registerCrud<ControleTypes>({
     id: "id",
-    prefix: "cim.controles",
+    prefix: "controles",
     colName: "contrôles",
     async onCreate(_, creation) {
       const id = `${snowflake.nextId()}`;
       return {
-        id, ...creation
+        ...{
+          id, 
+          points: []
+        },
+        ...creation,
+
       }
     },
-    async hydrateData(_, fields) {
-      return fields
-    },
+    hydrateData: hydrateControleData,
   });
 
   registerCrud<OrganismeDeControleTypes>({
     id: "id",
-    prefix: "cim.organismesDeControle",
+    prefix: "organismesDeControle",
     colName: "organismesDeControle",
     async onCreate(_, creation) {
       const id = `${snowflake.nextId()}`;

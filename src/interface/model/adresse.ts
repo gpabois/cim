@@ -9,7 +9,7 @@ export interface Adresse {
 export const adresseSchema = yup.object({
   lines: yup.array(yup.string()).required(),
   commune: yup.string().required(),
-  codePostal: yup.string().required().matches(/^[0-9]\d{5}$/g)
+  codePostal: yup.string().required().matches(/^[0-9]{5}$/g)
 })
 
 export function defaultAdresse(): Adresse {

@@ -53,7 +53,7 @@ export interface Updator<_T> {
 }
 
 /// Builder for an updator
-export class UpdatorBuilder<T> {
+export class UpdatorBuilder<T = any> {
   updator: Updator<T>;
   
   constructor() {

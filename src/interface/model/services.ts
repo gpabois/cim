@@ -5,8 +5,9 @@ import * as yup from 'yup';
 export interface ServiceTypes extends EntityTypes<string, ServiceCreation, ServiceData, ServiceFields> {};
 
 export interface ServiceFields {
-    nom: string,
-    équipe: Array<Contact>
+  id: string,
+  nom: string,
+  équipe: Array<Contact>
 }
 
 export const serviceFieldsSchema = yup.object({
@@ -14,10 +15,10 @@ export const serviceFieldsSchema = yup.object({
   équipe: yup.array(contactSchema)
 });
 
-export type ServiceCreation = ServiceFields;
+export type ServiceCreation = Omit<ServiceFields, "id">;
 export const serviceCreationSchema = serviceFieldsSchema;
 
-export type ServiceData = ServiceFields & {id: ServiceTypes['id']};
+export type ServiceData = ServiceFields;
 
 export function defaultServiceCreation() {
   return {
