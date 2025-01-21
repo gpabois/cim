@@ -1,20 +1,22 @@
-import { Condition, defaultCondition } from "@interface/model/condition";
-import { BaseFieldProps, Select } from "../form";
-import { ParamètreField } from "./paramètre";
-import { useFields } from "@app/hooks";
+import { Condition } from "@interface/model/condition";
+import {  Input, Select } from "../form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
-export interface ConditionFormProps extends BaseFieldProps<Condition> {}
+export interface ConditionFormProps {
+  defaultValues?: Condition,
+  onSubmit?: SubmitHandler<Condition>
+}
 
 export function ConditionForm(props: ConditionFormProps) {
-  const {form, updateForm} = useFields(props, defaultCondition);
+  const methods = useForm<Condition>({defaultValues: props.defaultValues})
+  const submit = (form) => props.onSubmit?.(form)
 
-  return <>
-    <ParamètreField label="Paramètre" value={form.param} onChange={param => updateForm(form => ({...form, param}))}/>
-    <Select 
-      label="Nature"
-      options={["MIN", "MAX", "REF"]}
-      transform={e => ({label: e, value: e})} 
-      onChange={kind => updateForm(form => ({...form, kind: kind?.value as Condition['kind']}))}>
-    </Select>
-  </>
+  return <FormProvider {...methods}>
+    <form onSubmit={methods.handleSubmit(submit)} className="flex flex-row items-center space-x-1">
+      <Input label="Valeur" {...methods.register("param.valeur")}/>
+      <Input label="Unité" {...methods.register("param.unité")}/>
+      <Select label="Type" {...methods.register("kind")} transform={(v) => ({label: v, value: v})} options={["MAX", "MIN", "REF"]}></Select>
+      <Input type="submit" value="Enregistrer"/>
+    </form>
+  </FormProvider>
 }

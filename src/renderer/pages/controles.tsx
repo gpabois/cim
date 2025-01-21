@@ -6,7 +6,7 @@ import { StackedList } from "@app/components/stackedList";
 import { guardCurrentProject } from "@app/guards/project";
 import { useAsync } from "@app/hooks";
 import { ControleTypes } from "@interface/model/controle";
-import { None, Optional } from "@interface/option";
+import { isNone, None, Optional } from "@interface/option";
 import { createContext, useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { FaWind } from "react-icons/fa6";
@@ -23,6 +23,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Input, MultiInput, Select } from "@app/components/form";
 import { Condition } from "@interface/model/condition";
 import { Accordeon } from "@app/components/accordeon";
+import { ConditionForm } from "@app/components/forms/condition";
+import { ParamètreForm } from "@app/components/forms/paramètre";
+import { Paramètre } from "@interface/model/paramètre";
 
 export function CreateControle() {
   const {id: projectId} = guardCurrentProject();
@@ -89,16 +92,10 @@ export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
   type ModeKind = {
     kind: "nouveau", 
     entity: "flux" | "conditionsRejet" | "concentrations"
-  } | {kind: "édition-émissaires"};
+  } | {kind: "édition", entity: "émissaires"};
   
   const [mode, setMode] = useState<Optional<ModeKind>>(None);
   
-  const deleteFn = async () => {
-    let updator = new UpdatorBuilder().removeArrayElementAt(`points`, props.id).build();
-    await api.controles.update(projectId, {id: props.controleId}, updator);
-    props.onUpdated?.();
-  };
-
   const UpdateEmissairesForm = () => {
     const methods = useForm<{émissaires: Array<string>}>({defaultValues: {émissaires: props.point.émissaires}});
     
@@ -122,18 +119,67 @@ export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
     return "~"
   }
 
-  const DetailRejets = ({rejets}: {rejets: Array<ConditionRejetAir>}) => {
+  const DetailRejets = ({rejets, kind}: {rejets: Array<ConditionRejetAir>, kind: "flux" | "conditionsRejet" | "concentrations"}) => {
+    const deleteRejet = async (index: number) => {
+      const updator = new UpdatorBuilder().removeArrayElementAt(`points.${props.id}.${kind}`, index).build();
+      await api.controles.update(projectId, {id: controleCtx.id}, updator);
+      controleCtx.onUpdate();
+    }
+
+    const editExigence = (rejetId: number) => (async (form: Condition) => {
+      const updator = new UpdatorBuilder().set(`points.${props.id}.${kind}.${rejetId}.exigence`, form).build();
+      await api.controles.update(projectId, {id: controleCtx.id}, updator);
+      controleCtx.onUpdate();
+    })
+
+    const editResultat = (rejetId: number) => (async (form: Paramètre) => {
+      const updator = new UpdatorBuilder().set(`points.${props.id}.${kind}.${rejetId}.résultat`, form).build();
+      await api.controles.update(projectId, {id: controleCtx.id}, updator);
+      controleCtx.onUpdate();  
+    })
+
+    type ModeKind = {kind: "édition", entity: "exigence" | "résultat", id: number};
+
+    const [mode, setMode] = useState<Optional<ModeKind>>(None);
+
     return <DescriptionList>
     {{
-      fields: rejets.map((rejet, _index) => ({
+      fields: rejets.map((rejet, id) => ({
         key: rejet.nom,
         heading: <div className="flex items-center text-sm">
           <span className="flex-1">{rejet.nom}</span>
-          <BiTrash/>
+
         </div>,
-        content: <>
-          <ConditionSymbol kind={rejet.exigence.kind}/> {rejet.exigence.param.valeur} {rejet.exigence.param.unité}
-        </>
+        content: <div className="flex space-x-2">
+          <span className="flex-1">
+            {mode?.kind == "édition" && mode?.entity == "exigence" ? 
+              <ConditionForm onSubmit={editExigence(id)} defaultValues={rejet.exigence}/>
+            : <div className="flex space-x-2">
+                <span>
+                  <ConditionSymbol kind={rejet.exigence.kind}/> 
+                  {rejet.exigence.param.valeur} 
+                  {rejet.exigence.param.unité} 
+                </span>
+                <Button theme="barebone" onClick={() => setMode({kind: "édition", entity: "exigence", id})}><BiEdit/></Button>
+              </div>
+            }
+          </span>
+          <span className="flex-1">
+            {mode?.kind == "édition" && mode?.entity == "résultat" &&
+              <ParamètreForm 
+                  onSubmit={editResultat(id)} 
+                  defaultValues={rejet.résultat || {valeur: 0, unité: rejet.exigence.param.unité}}
+              />
+            }
+            {isNone(mode) && 
+              <>
+                {rejet.résultat ? <span>{rejet.résultat.valeur} {rejet.résultat.unité}</span>: <span>-</span>}
+                <Button theme="barebone" onClick={() => setMode({kind: "édition", entity: "résultat", id})}><BiEdit/></Button>
+              </>
+            }
+          </span>
+          <Button theme="barebone" className="text-red-600" onClick={() => deleteRejet(id)}><BiTrash/></Button>
+        </div>
       }))
     }}
   </DescriptionList>
@@ -171,9 +217,9 @@ export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
             key: "émissaires",
             heading: <div className="flex space-x-2 items-center">
               <span className="flex">Emissaires</span>
-              <Button theme="barebone" onClick={() => setMode({kind: "édition-émissaires"})}><BiEdit/></Button>
+              <Button theme="barebone" onClick={() => setMode({kind: "édition", entity: "émissaires"})}><BiEdit/></Button>
             </div>,
-            content: <>{mode?.kind == "édition-émissaires" ? <UpdateEmissairesForm/> : <div>
+            content: <>{mode?.kind == "édition" && mode?.entity === "émissaires" ? <UpdateEmissairesForm/> : <div>
                 <ul>
                   {point.émissaires.map((émissaire, index) => <li key={index}>{émissaire}</li>)}
                 </ul>
@@ -194,7 +240,7 @@ export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
             content: <>
               {mode?.kind == "nouveau" && mode?.entity == "conditionsRejet" ? 
                 <RejetForm kind="conditionsRejet"></RejetForm> 
-                : <DetailRejets rejets={props.point.conditionsRejet}></DetailRejets>
+                : <DetailRejets rejets={props.point.conditionsRejet} kind="conditionsRejet"></DetailRejets>
               }
             </>
           }, {
@@ -206,7 +252,7 @@ export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
             content: <>
               {mode?.kind == "nouveau" && mode?.entity == "concentrations" ? 
                   <RejetForm kind="concentrations"></RejetForm>
-                : <DetailRejets rejets={props.point.concentrations}></DetailRejets>
+                : <DetailRejets rejets={props.point.concentrations} kind="concentrations"></DetailRejets>
               }
             </>
           }, {
@@ -218,7 +264,7 @@ export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
             content: <>
               {mode?.kind == "nouveau" && mode?.entity == "flux" ? 
                 <RejetForm kind="flux"></RejetForm>
-                : <DetailRejets rejets={props.point.flux}></DetailRejets>
+                : <DetailRejets rejets={props.point.flux} kind="flux"></DetailRejets>
               }
             </>
           }
@@ -248,8 +294,14 @@ export function ControleDetails() {
   const addPointDeControleAir = async (pdc: PointDeControleAir) => {
     const updator = new UpdatorBuilder<ControleAirFields>().add("points", pdc).build();
     await api.controles.update(projectId, {id}, updator);
-    state.run({projectId, id});    
+    refresh(); 
     setMode(None);
+  }
+
+  const removePointDeControleAir = async (index: number) => {
+    const updator = new UpdatorBuilder<ControleAirFields>().removeArrayElementAt("points", index).build();
+    await api.controles.update(projectId, {id}, updator);
+    refresh();
   }
 
   return <div className="p-2 w-full">
@@ -303,7 +355,7 @@ export function ControleDetails() {
                         key: `${index}`,
                         title: <div className="flex w-full">
                           <span className="font-semibold text-sm flex-1">Point de contrôle n°{`${index + 1}`}</span>
-                          <Button theme="barebone" onClick={() => {}}><BiTrash className="text-red-600"/></Button>
+                          <Button theme="barebone" onClick={() => removePointDeControleAir(index)}><BiTrash className="text-red-600"/></Button>
                         </div>,
                         content: <PointDeControleAirDetail 
                           controleId={id!}

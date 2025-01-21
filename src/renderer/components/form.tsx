@@ -53,7 +53,7 @@ export interface SelectProps<V, T=V> {
 export function Select<V, T=V>(props: UseControllerProps & SelectProps<V, T>) {
   const { field } = useController(props);
   
-  return <>
+  return <div>
     <Option 
       value={props.label} 
       onSome={(label) => <label htmlFor={props.name} className="mb-2 text-sm font-medium text-gray-900">
@@ -63,13 +63,13 @@ export function Select<V, T=V>(props: UseControllerProps & SelectProps<V, T>) {
     <ForeignSelect<{label: string, value: V}>
       classNames={{
         container: (_) => 'rounded-md',
-        valueContainer: (_) => 'text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+        valueContainer: (_) => 'text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5'
       }}
       {...field}
       onChange={(v) => field.onChange(v?.value)}
       options={props.options.map(props.transform)}>
     </ForeignSelect>
-  </>
+  </div>
 }
 
 export interface InputButton {
@@ -88,14 +88,14 @@ export interface InputProps {
 export const Input =  forwardRef<HTMLInputElement, Partial<UseFormRegisterReturn> & JSX.IntrinsicElements['input'] & InputProps>(function (props, ref) {
 
   if(props.type === "radio") {
-    return <>
+    return <div>
           <input 
             ref={ref} 
             className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500" 
             {...props} 
           />
           {props.label && <label htmlFor={props.id} className="ms-2 text-sm font-medium text-gray-900">{props.label}</label>}
-    </>;
+    </div>;
   }
 
   if(props.type === "button" || props.type === "submit") {
