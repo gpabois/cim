@@ -20,7 +20,7 @@ export abstract class BaseController<Prefix extends keyof ICimAPI> {
     .forEach(([name, handler]) => {
       ipcMain.handle(
         this.ipcEntryPoint(name), 
-        handler
+        (_event, ...args) => handler(...args)
       )
     })
   }

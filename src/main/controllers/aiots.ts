@@ -15,7 +15,6 @@ export class AiotsController extends BaseController<"aiots"> implements Crud<Aio
     this.expose(exposeCrud<AiotTypes>(this));
   }
 
-
   /// Hydrate les données de l'AIOT
   async hydrate(_projectId: ProjectId, aiot: AiotFields): Promise<AiotData> {
     return {
@@ -34,13 +33,23 @@ export class AiotsController extends BaseController<"aiots"> implements Crud<Aio
   async list(projectId: ProjectId, query: SerChunkQuery<AiotFields>): Promise<AiotData[]> {
     const project = Project.get(projectId)!;
     const aiots = project.db.getCollection("aiots");
-    return Promise.all([...imap(aiots.findBy(query), partial(this.hydrate, [projectId]))])
+
+    return Promise.all([
+      ...imap(
+        aiots.findBy(query),
+        fields => this.hydrate(projectId, fields)
+      )
+    ])
   }
 
   async get(projectId: ProjectId, codeAiot: string): Promise<Optional<AiotData>> {
     const project = Project.get(projectId)!;
     const aiots = project.db.getCollection("aiots");
-    return mapSome(aiots.findOneBy({codeAiot}), partial(this.hydrate, [projectId]));
+    
+    return mapSome(
+      aiots.findOneBy({codeAiot}), 
+      fields => this.hydrate(projectId, fields)
+    );
   }
 
   async update(projectId: ProjectId, filter: Filter<AiotFields>, updator: Updator<AiotFields>): Promise<void> {

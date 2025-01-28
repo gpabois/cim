@@ -34,12 +34,12 @@ export class Project {
 
     /// Ouvre un projet depuis une zone de stockage
     public static async open(rootStorage: Storage): Promise<ProjectId> {
-      let projectId = `${snowflake.nextId()}`;
+      const projectId = `${snowflake.nextId()}`;
 
-      let db = await new Database({rootStorage})
-      let tpl = new Template({rootStorage});
+      const db = new Database({rootStorage})
+      const tpl = new Template({rootStorage});
   
-      let project = new Project({db, tpl});
+      const project = new Project({db, tpl});
       currentProjects[projectId] = project;
       return projectId;
     } 
