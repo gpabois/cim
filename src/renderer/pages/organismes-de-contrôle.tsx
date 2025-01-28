@@ -1,11 +1,11 @@
-import api from "@app/api";
-import { AsyncResolved } from "@app/components/async";
-import { Breadcrumbs } from "@app/components/breadcrumbs";
-import { OrganismeDeControleCreationForm } from "@app/components/forms/organismeDeControle";
-import { StackedList } from "@app/components/stackedList";
-import { guardCurrentProject } from "@app/guards/project";
-import { useAsync } from "@app/hooks";
-import { defaultOrganismeDeControleCreation, OrganismeDeControleCreation } from "@interface/model/organismes_de_controle";
+import api from "@renderer/api";
+import { AsyncResolved } from "@renderer/components/async";
+import { Breadcrumbs } from "@renderer/components/breadcrumbs";
+import { OrganismeDeControleCreationForm } from "@renderer/components/forms/organisme-de-contrôle";
+import { StackedList } from "@renderer/components/stacked-list";
+import { guardCurrentProject } from "@renderer/guards/project";
+import { useAsync } from "@renderer/hooks";
+import { defaultOrganismeDeControleCreation, OrganismeDeControleCreation } from "@shared/model/organismes-de-controle";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 

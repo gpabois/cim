@@ -1,5 +1,5 @@
-import { isNone } from "./option";
-import { Predicate } from "./types";
+import { isNone } from "../option";
+import { Predicate } from "../types";
 
 export type Filter<T> = OpCmp<T> & ObjCmp<T> | OpCmp<T> | T;
 export type OpCmp<T> = {

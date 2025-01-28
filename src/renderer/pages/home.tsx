@@ -1,8 +1,8 @@
-import { useAppDispatch, useCurrentProject } from "@app/hooks";
-import {newProject, openProject} from "@app/features/projects/projectsSlice";
-import { Option } from "@app/components/option";
+import { useAppDispatch, useCurrentProject } from "../hooks";
+import {newProject, openProject} from "../features/projects/projectsSlice";
+import { Option } from "../components/option";
 import { Link } from "react-router";
-import { Breadcrumbs } from "@app/components/breadcrumbs";
+import { Breadcrumbs } from "../components/breadcrumbs";
 
 export default function Home() {
   const dispatch = useAppDispatch();

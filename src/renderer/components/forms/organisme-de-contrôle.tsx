@@ -1,6 +1,6 @@
 import Form from "@app/components/form";
 import { AdresseField } from "@app/components/forms/adresse";
-import { OrganismeDeControleCreation } from "@interface/model/organismes_de_controle";
+import { OrganismeDeControleCreation } from "@interface/model/organismes-de-controle";
 import { FormProvider, SubmitHandler, useForm, UseFormProps } from "react-hook-form";
 import { Button } from "../button";
 

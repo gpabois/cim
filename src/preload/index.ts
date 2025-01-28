@@ -1,12 +1,13 @@
 import {contextBridge, ipcRenderer } from 'electron';
-import { Filter, SerChunkQuery, Updator } from '@interface/query';
-import { Crud } from '@interface/types';
-import { EntityTypes } from '@interface/model/index';
-import { ProjectId } from '@interface/model';
-import { AiotTypes } from '@interface/model/aiots';
-import { ControleTypes } from '@interface/model/controle';
-import { OrganismeDeControleTypes } from '@interface/model/organismes_de_controle';
-import { ServiceTypes } from '@interface/model/services';
+import { Filter, SerChunkQuery, Updator } from '@shared/database/query';
+import { Crud } from '@shared/types';
+import { EntityTypes } from '@shared/model/index';
+import { ProjectId } from '@shared/model';
+import { AiotTypes } from '@shared/model/aiots';
+import { ControleTypes } from '@shared/model/controle';
+import { OrganismeDeControleTypes } from '@shared/model/organismes-de-controle';
+import { ServiceTypes } from '@shared/model/services';
+import { ICimAPI } from '@shared/bridge';
 
 export function registerCrud<Types extends EntityTypes>(prefix: string): Crud<Types> {
  return {
@@ -19,26 +20,29 @@ export function registerCrud<Types extends EntityTypes>(prefix: string): Crud<Ty
   }
 }
 
-contextBridge.exposeInMainWorld('cim', {
-    template: {
-      generateAndSave<T>(project: ProjectId, name: string, data: T) {
-        return ipcRenderer.invoke('cim.template.generateAndSave', project, name, data)
-      }
-    },
-    services: {
-      ...registerCrud<ServiceTypes>('services')
-    },
-    project: {
-        open: (): Promise<ProjectId> => ipcRenderer.invoke('cim.project.open'),
-        new: (): Promise<ProjectId> => ipcRenderer.invoke('cim.project.new'),
-    },
-    aiots: {
-      ...registerCrud<AiotTypes>("aiots")
-    },
-    controles: {
-      ...registerCrud<ControleTypes>("controles")
-    },
-    organismeDeControles: {
-      ...registerCrud<OrganismeDeControleTypes>("organismesDeControle")
+/// Pont entre le renderer et le main process
+const cimBridge: ICimAPI = {
+  template: {
+    generateAndSave<T>(project: ProjectId, name: string, data: T) {
+      return ipcRenderer.invoke('cim.template.generateAndSave', project, name, data)
     }
-})
+  },
+  services: {
+    ...registerCrud<ServiceTypes>('services')
+  },
+  project: {
+      open: (): Promise<ProjectId> => ipcRenderer.invoke('cim.project.open'),
+      new: (): Promise<ProjectId> => ipcRenderer.invoke('cim.project.new'),
+  },
+  aiots: {
+    ...registerCrud<AiotTypes>("aiots")
+  },
+  contrôles: {
+    ...registerCrud<ControleTypes>("controles")
+  },
+  organismesDeContrôle: {
+    ...registerCrud<OrganismeDeControleTypes>("organismesDeControle")
+  }
+};
+
+contextBridge.exposeInMainWorld('cim', cimBridge)

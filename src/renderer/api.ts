@@ -1,18 +1,18 @@
-import { ProjectId } from "@interface/model";
-import { AiotTypes } from "@interface/model/aiots";
-import { Contact } from "@interface/model/contact";
-import { ControleTypes } from "@interface/model/controle";
-import { EntityTypes } from "@interface/model/index";
-import { OrganismeDeControleTypes } from "@interface/model/organismes_de_controle";
-import { ServiceTypes } from "@interface/model/services";
-import { Filter, UpdatorBuilder } from "@interface/query";
-import { Crud } from "@interface/types";
+import { ProjectId } from "@shared/model";
+import { AiotTypes } from "@shared/model/aiots";
+import { Contact } from "@shared/model/contact";
+import { ControleTypes } from "@shared/model/controle";
+import { EntityTypes } from "@shared/model/index";
+import { OrganismeDeControleTypes } from "@shared/model/organismes-de-controle";
+import { ServiceTypes } from "@shared/model/services";
+import { Filter, UpdatorBuilder } from "@shared/database/query";
+import { Crud } from "@shared/types";
 
 function registerCrud<
   Types extends EntityTypes,
   Prefix extends keyof Window['cim'] = any
 >(prefix: Prefix): Crud<Types> {
-  return window.cim[prefix] as Crud<Types>;
+  return window.cim[prefix] as any as Crud<Types>;
 }
 
 const aiotsCrud = registerCrud<AiotTypes>('aiots');

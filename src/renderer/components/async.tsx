@@ -1,4 +1,4 @@
-import { AsyncState } from "@app/hooks";
+import { AsyncState } from "@renderer/hooks";
 
 export interface AsyncPendingProps<T, Args> {
   state: AsyncState<T, Args>,

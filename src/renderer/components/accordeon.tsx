@@ -1,4 +1,4 @@
-import { None, Optional } from "@interface/option";
+import { None, Optional } from "@shared/option";
 import { useState } from "react"
 
 export interface AccordeonProps {

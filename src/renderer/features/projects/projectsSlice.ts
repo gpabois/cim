@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {ProjectId} from "@interface/model";
-import { isSome, None, Optional } from "@interface/option";
+import {ProjectId} from "@shared/model";
+import { isSome, None, Optional } from "@shared/option";
 
 export interface ProjectsState {
     current: Optional<ProjectId>,

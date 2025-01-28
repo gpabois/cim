@@ -1,6 +1,6 @@
-import { useCurrentProject } from "@app/hooks";
-import { ProjectId } from "@interface/model";
-import { isNone } from "@interface/option";
+import { useCurrentProject } from "@renderer/hooks";
+import { ProjectId } from "@shared/model";
+import { isNone } from "@shared/option";
 import { redirect } from "react-router";
 
 export function guardCurrentProject(): {id: ProjectId} {

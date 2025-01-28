@@ -1,20 +1,20 @@
-import { OptionGuard } from "@app/components/option";
+import { OptionGuard } from "@renderer/components/option";
 import { Link, useNavigate } from "react-router";
-import { AiotCreationForm } from "@app/components/forms/aiot";
-import { guardCurrentProject } from "@app/guards/project";
+import { AiotCreationForm } from "@renderer/components/forms/aiot";
+import { guardCurrentProject } from "@renderer/guards/project";
 import { useParams } from "react-router";
 import { groupby, imap, sorted } from "itertools";
-import { DescriptionList } from "@app/components/descriptionList";
-import { StackedList } from "@app/components/stackedList";
-import { Breadcrumbs } from "@app/components/breadcrumbs";
-import { AiotCreation, AiotData, AiotTypes, defaultAiotCreation } from "@interface/model/aiots";
-import api from "@app/api";
+import { DescriptionList } from "@renderer/components/description-list";
+import { StackedList } from "@renderer/components/stacked-list";
+import { Breadcrumbs } from "@renderer/components/breadcrumbs";
+import { AiotCreation, AiotData, AiotTypes, defaultAiotCreation } from "@shared/model/aiots";
+import api from "@renderer/api";
 
-import { UpdatorBuilder } from "@interface/query";
-import { EquipeDetails } from "@app/components/équipe";
-import { Contact } from "@interface/model/contact";
-import { useAsync } from "@app/hooks";
-import { AsyncPending, AsyncResolved } from "@app/components/async";
+import { UpdatorBuilder } from "@shared/database/query";
+import { EquipeDetails } from "@renderer/components/équipe";
+import { Contact } from "@shared/model/contact";
+import { useAsync } from "@renderer/hooks";
+import { AsyncPending, AsyncResolved } from "@renderer/components/async";
 
 /// Créée un nouvel AIOT.
 export function CreateAiot() {

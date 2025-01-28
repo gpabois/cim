@@ -3,7 +3,7 @@ import { Option } from './option';
 import ForeignSelect from 'react-select'
 import AsyncForeignSelect from 'react-select/async';
 import { Controller, useController, UseControllerProps, useFieldArray, useFormContext, UseFormRegisterReturn } from 'react-hook-form';
-import { useScopedFormContext } from '@app/hooks';
+import { useScopedFormContext } from '@renderer/hooks';
 import { Button, ButtonProps, buttonSizes, buttonThemes } from './button';
 import { BiAddToQueue } from 'react-icons/bi';
 

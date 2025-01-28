@@ -1,4 +1,4 @@
-import { isSome as isSome, Optional } from "@interface/option";
+import { isSome as isSome, Optional } from "@shared/option";
 import { Navigate } from "react-router";
 
 export interface OptionProps<T> {

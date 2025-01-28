@@ -1,12 +1,11 @@
 import { HashRouter, Link, Route, Routes } from 'react-router';
-import '@app/style.css';
-import Home from '@app/pages/home'
-import { AiotDetails, AiotsList, CreateAiot } from '@app/pages/aiots';
-import { useCurrentProject } from '@app/hooks';
-import { Option } from '@app/components/option';
+import Home from './pages/home'
+import { AiotDetails, AiotsList, CreateAiot } from './pages/aiots';
+import { useCurrentProject } from './hooks';
+import { Option } from './components/option';
 import { Error404 } from './pages/404';
-import { CreateOrganismeDeControle, OrganismesDeControleList } from './pages/organismeDeControle';
-import { ControleDetails, ControlesList, CreateControle } from './pages/controles';
+import { CreateOrganismeDeControle, OrganismesDeControleList } from './pages/organismes-de-contrôle';
+import { ControleDetails, ControlesList, CreateControle } from './pages/contrôles';
 import { CreateService, ServiceDetails, ServicesList } from './pages/services';
 import { ErrorBoundary } from './components/error';
 
@@ -19,7 +18,7 @@ export function Titlebar() {
       value={maybeCurrentProject}
       onSome={(_) => <>
         <Link to={`/aiots`} viewTransition>AIOTS</Link>
-        <Link to={`/organismesDeControle`} viewTransition>Organismes</Link>
+        <Link to={`/organismes-de-contrôle`} viewTransition>Organismes</Link>
         <Link to={`/contrôles`} viewTransition>Contrôles</Link>
         <Link to={`/services`} viewTransition>Services</Link>
       </>}
@@ -27,7 +26,7 @@ export function Titlebar() {
   </div>
 }
 
-export default function App() {
+export function App() {
   return (
     <div className="flex flex-col">
       <HashRouter basename="/">
@@ -51,7 +50,7 @@ export default function App() {
               <Route path="create" element={<CreateControle />}></Route>
               <Route path=":id" element={<ControleDetails/>}></Route>
             </Route>
-            <Route path="organismesDeControle">
+            <Route path="organismes-de-contrôle">
               <Route index element={<OrganismesDeControleList />}></Route>
               <Route path="create" element={<CreateOrganismeDeControle />}></Route>
             </Route>

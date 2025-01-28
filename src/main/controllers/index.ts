@@ -1,0 +1,40 @@
+import { ICimAPI } from "@shared/bridge";
+import { EntityTypes } from "@shared/model";
+import { Crud } from "@shared/types";
+
+export abstract class BaseController<Prefix extends keyof ICimAPI> {
+  private prefix: Prefix;
+  private exposed: Record<string, any>
+
+  constructor(prefix: Prefix, expose: Record<string, any>) {
+    this.prefix = prefix;
+    this.exposed = expose;
+  }
+
+  expose(exposed: ICimAPI[Prefix]) {
+    this.exposed = {...this.exposed, ...exposed};
+
+  }
+  register(ipcMain: Electron.IpcMain) {
+    Object.entries(this.exposed)
+    .forEach(([name, handler]) => {
+      ipcMain.handle(
+        this.ipcEntryPoint(name), 
+        handler
+      )
+    })
+  }
+
+  ipcEntryPoint(name: string): string {
+    return `cim.${this.prefix}.${name}`
+  } 
+}
+
+export function exposeCrud<E extends EntityTypes>(entry: Crud<E>): Crud<E> {
+  return {
+    create: entry.create,
+    update: entry.update,
+    list: entry.list,
+    get: entry.get
+  }
+}

@@ -1,9 +1,9 @@
-import { Contact } from "@interface/model/contact";
-import { isNone, None } from "@interface/option";
+import { Contact } from "@shared/model/contact";
+import { isNone, None } from "@shared/option";
 import { useState } from "react";
 import { BiEdit, BiSolidAddToQueue } from "react-icons/bi";
 import { Button } from "./button";
-import { StackedList } from "./stackedList";
+import { StackedList } from "./stacked-list";
 import { ContactForm } from "./forms/contact";
 
 export interface EquipeDetailsProps {

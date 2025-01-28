@@ -1,16 +1,20 @@
+import { Storage } from './storage';
 import {createReport} from 'docx-templates';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 
 export class Template {
-  root: string
-  constructor(root: string) {
-    this.root = root
+  storage: Storage
+
+  constructor(args: {rootStorage: Storage}) {
+    this.storage = args.rootStorage.from("templates")
+  }
+
+  static create(rootStorage: Storage) {
+    rootStorage.mkdir("templates")
   }
 
   public async generateFromName<T>(name: string, data: T): Promise<Uint8Array> {
-    const template = await fs.readFile(path.join(this.root, "modèles", `${name}.docx`));
-    return await this.generateFromBuffer(template, data);
+    const bytes = this.storage.read(name);
+    return await this.generateFromBuffer(bytes as any, data);
   }
 
   public async generateFromBuffer<T>(template: Buffer, data: T): Promise<Uint8Array> {

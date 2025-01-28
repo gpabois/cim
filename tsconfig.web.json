@@ -11,11 +11,12 @@
       "jsx": "react-jsx",
       "baseUrl": ".",
       "paths": {
-        "@app/*": [
+        "@renderer/*": [
           "src/renderer/*"
         ],
-        "@interface/*": [
-            "src/interface/*"
+        "@shared/*": [
+          "src/interface/*",
+          "src/shared/*"
         ]
       }
     }
