@@ -13,6 +13,11 @@ export class AiotsController extends BaseController<"aiots"> implements Crud<Aio
     super("aiots", {});
     this.expose(exposeCrud<AiotTypes>(this));
   }
+  async remove(projectId: ProjectId, filter: Filter<AiotFields>): Promise<void> {
+    const project = Project.get(projectId)!;
+    const aiots = project.db.getCollection("aiots");
+    aiots.remove(filter);
+  }
 
   /// Hydrate les données de l'AIOT
   async hydrate(_projectId: ProjectId, aiot: AiotFields): Promise<AiotData> {

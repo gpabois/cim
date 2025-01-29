@@ -1,4 +1,4 @@
-import { Paramètre } from "@interface/model/paramètre";
+import { Paramètre } from "@shared/model/paramètre";
 import { Input } from "../form";
 import { FieldPath, FieldValues, FormProvider, SubmitHandler, UseControllerProps, useForm, useFormContext } from "react-hook-form";
 

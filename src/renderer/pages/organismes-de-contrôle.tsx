@@ -1,15 +1,62 @@
 import api from "@renderer/api";
 import { AsyncResolved } from "@renderer/components/async";
-import { Breadcrumbs } from "@renderer/components/breadcrumbs";
+import { Button } from "@renderer/components/button";
+import { DescriptionList } from "@renderer/components/description-list";
 import { OrganismeDeControleCreationForm } from "@renderer/components/forms/organisme-de-contrôle";
+import { OptionGuard } from "@renderer/components/option";
 import { Page } from "@renderer/components/page";
 import { StackedList } from "@renderer/components/stacked-list";
 import { guardCurrentProject } from "@renderer/guards/project";
 import { useAsync } from "@renderer/hooks";
 import { defaultOrganismeDeControleCreation, OrganismeDeControleCreation } from "@shared/model/organismes-de-controle";
 import { useTranslation } from "react-i18next";
-import { BiAddToQueue } from "react-icons/bi";
+import { BiAddToQueue, BiTrash } from "react-icons/bi";
+import { useParams } from "react-router";
 import { Link, useNavigate } from "react-router";
+
+export function OrganismeDeControleDetails() {
+  const { t } = useTranslation();
+  const {id: projectId} = guardCurrentProject();
+  const {id} = useParams();
+  const navigate = useNavigate();
+
+  const promiseFn = async ({ projectId, id }) => {
+    return await api.organismesDeControle.get(projectId, id);
+  };
+  const state = useAsync(promiseFn, {projectId, id});
+  type ModeKind = "edit-nom";
+
+  const deleteOrganisme = async () => {
+    await api.organismesDeControle.remove(projectId, {id});
+    navigate("/organismes-de-contrôle")
+  }
+
+  return <>
+    <AsyncResolved state={state}>
+      {maybeOrganismeDeControle => <OptionGuard value={maybeOrganismeDeControle} redirect="/404">
+        {organisme => <Page
+            heading={organisme.nom}
+            action={
+              <div className="flex">
+                <Button theme="danger" onClick={deleteOrganisme}><BiTrash/></Button>
+              </div>
+            }
+            breadcrumbs={[
+              <Link to="/">{t("Home")}</Link>,
+              <Link to="/organismes-de-contrôle">Organismes de contrôle</Link>,
+              <span>{organisme.nom}</span>
+            ]}
+          >
+          <DescriptionList>
+            {{
+              fields: []
+            }}
+          </DescriptionList>
+        </Page>}
+      </OptionGuard>}
+    </AsyncResolved>
+  </>
+}
 
 export function CreateOrganismeDeControle() {
   const { t } = useTranslation();
@@ -20,17 +67,25 @@ export function CreateOrganismeDeControle() {
     api.organismesDeControle
       .create(currentProject.id, form)
       .then((id: string) => {
-        navigate(`/organismesDeControle/${id}`);
+        navigate(`/organismes-de-contrôle/${id}`);
       })
   }
 
-  return <div className="p-2">
-    <Breadcrumbs>
-      <Link to="/">{t("Home")}</Link>
-      <Link to="/organismesDeControle">{t("OrganismesDeControle")}</Link>
-    </Breadcrumbs>
-    <OrganismeDeControleCreationForm defaultValues={defaultOrganismeDeControleCreation()} onSubmit={create} />
-  </div>
+  return <Page 
+      heading="Nouvel organisme de contrôle" 
+      breadcrumbs={[
+        <Link to="/">{t("Home")}</Link>,
+        <Link to="/organismes-de-contrôle">{t("OrganismesDeControle")}</Link>,
+        <span>Nouveau</span>
+      ]}
+    >
+    <div className="py-2 px-2">
+      <OrganismeDeControleCreationForm 
+        defaultValues={defaultOrganismeDeControleCreation()} 
+        onSubmit={create} 
+      />
+    </div>
+  </Page>
 }
 
 export function OrganismesDeControleList() {
@@ -45,7 +100,7 @@ export function OrganismesDeControleList() {
 
   return <Page
     heading="Liste des organismes de contrôle"
-    action={<Link to="/organismesDeControle/create"><BiAddToQueue/></Link>}
+    action={<Link to="/organismes-de-contrôle/create"><BiAddToQueue/></Link>}
     breadcrumbs={[
       <Link to="/">{t("Home")}</Link>,
       <span>{t("OrganismesDeControle")}</span>
@@ -56,7 +111,7 @@ export function OrganismesDeControleList() {
         <StackedList>
           {organismesDeControle.map(organismeDeControle => ({
             key: organismeDeControle.id,
-            content: <Link to={`/organismesDeControle/${organismeDeControle.id}`} > {organismeDeControle.nom}</Link>
+            content: <Link to={`/organismes-de-contrôle/${organismeDeControle.id}`} > {organismeDeControle.nom}</Link>
           }))}
         </StackedList>
       }

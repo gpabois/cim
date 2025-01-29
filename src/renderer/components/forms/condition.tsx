@@ -1,4 +1,4 @@
-import { Condition } from "@interface/model/condition";
+import { Condition } from "@shared/model/condition";
 import {  Input, Select } from "../form";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 

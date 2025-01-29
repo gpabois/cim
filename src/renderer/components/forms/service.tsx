@@ -1,8 +1,8 @@
-import { guardCurrentProject } from "@app/guards/project";
+import { guardCurrentProject } from "@renderer/guards/project";
 import { AsyncSelect, Input } from "../form";
 import { FormProvider, SubmitHandler, useForm, useFormContext } from "react-hook-form";
-import { useYupValidationResolver } from "@app/hooks";
-import { ServiceCreation, serviceCreationSchema, ServiceTypes } from "@interface/model/services";
+import { useYupValidationResolver } from "@renderer/hooks";
+import { ServiceCreation, serviceCreationSchema, ServiceTypes } from "@shared/model/services";
 import { useTranslation } from "react-i18next";
 
 export interface SelectServiceProps {

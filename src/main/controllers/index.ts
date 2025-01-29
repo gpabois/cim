@@ -33,6 +33,7 @@ export abstract class BaseController<Prefix extends keyof ICimAPI> {
 export function exposeCrud<E extends EntityTypes>(entry: Crud<E>): Crud<E> {
   return {
     create: (...args) => entry.create(...args),
+    remove: (...args) => entry.remove(...args),
     update: (...args) => entry.update(...args),
     list: (...args) => entry.list(...args),
     get: (...args) => entry.get(...args)

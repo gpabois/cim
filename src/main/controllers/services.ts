@@ -1,4 +1,4 @@
-import { ServiceTypes } from "@shared/model/services";
+import { ServiceFields, ServiceTypes } from "@shared/model/services";
 import { BaseController, exposeCrud } from ".";
 import { Hydrator } from "..";
 import { Crud } from "@shared/types";
@@ -14,6 +14,12 @@ export class ServicesController extends BaseController<"services"> implements Cr
   constructor() {
     super("services", {});
     this.expose(exposeCrud<ServiceTypes>(this));
+  }
+  
+  async remove(projectId: ProjectId, query: Filter<ServiceFields>) {
+    const project = Project.get(projectId)!;
+    const services = project.db.getCollection("services");
+    services.remove(query) 
   }
 
   async hydrate(_projectId: ProjectId, fields: ServiceTypes["fields"]): Promise<ServiceTypes["data"]> {

@@ -9,6 +9,7 @@ import { imap } from "itertools";
 import { Project } from "@shared/project";
 import { mapSome, Optional } from "@shared/option";
 import { AiotsController } from "./aiots";
+import { ControleAirFields } from "@shared/model/controle/air";
 
 export interface ControlesControllerArgs {
   aiots: AiotsController 
@@ -21,6 +22,11 @@ export class ControlesController extends BaseController<"contrôles"> implements
     super("contrôles", {});
     this.expose(exposeCrud<ControleTypes>(this));
     this.aiots = args.aiots;
+  }
+  async remove(projectId: ProjectId, query: Filter<ControleAirFields>): Promise<void> {
+    const project = Project.get(projectId)!;
+    const controles = project.db.getCollection("contrôles");
+    controles.remove(query);
   }
 
   async hydrate(projectId: ProjectId, fields: ControleTypes["fields"]): Promise<ControleTypes["data"]> {
@@ -35,12 +41,12 @@ export class ControlesController extends BaseController<"contrôles"> implements
 
   async create(projectId: ProjectId, create: ControleTypes["creation"]): Promise<string> {
     const project = Project.get(projectId)!;
-    const services = project.db.getCollection("contrôles");
+    const controles = project.db.getCollection("contrôles");
     const insert: ControleTypes["fields"] = {
       id: `${snowflake.nextId()}`,
       ...create
     }
-    services.insert(insert);
+    controles.insert(insert);
     return insert.id;
   }
 

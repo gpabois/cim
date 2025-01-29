@@ -1,13 +1,13 @@
 import axios from "axios";
 import { AsyncSelect, Input } from "../form";
-import { isNone, isSome, Optional } from "@interface/option";
+import { isNone, isSome, Optional } from "@shared/option";
 import { AdresseField } from "./adresse";
-import { guardCurrentProject } from "@app/guards/project";
-import { AiotCreation, aiotCreationSchema } from "@interface/model/aiots";
+import { guardCurrentProject } from "@renderer/guards/project";
+import { AiotCreation, aiotCreationSchema } from "@shared/model/aiots";
 import { FieldValues, FormProvider, SubmitHandler, UseControllerProps, useForm, UseFormProps, useWatch } from "react-hook-form";
-import { useYupValidationResolver } from "@app/hooks";
+import { useYupValidationResolver } from "@renderer/hooks";
 import { useTranslation } from "react-i18next";
-import api from "@app/api";
+import api from "@renderer/api";
 
 export interface AiotSelectionProps {
   label?: string

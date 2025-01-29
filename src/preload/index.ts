@@ -13,6 +13,7 @@ export function registerCrud<Types extends EntityTypes>(prefix: string): Crud<Ty
  return {
     create: (project: ProjectId, nouveau: Types['creation']) => ipcRenderer.invoke(`cim.${prefix}.create`, project, nouveau),
     list: (projectId: ProjectId, query: SerChunkQuery<Types['fields']>) => ipcRenderer.invoke(`cim.${prefix}.list`, projectId, query),
+    remove: (projectId: ProjectId, query: Filter<Types["fields"]>) => ipcRenderer.invoke(`cim.${prefix}.remove`, projectId, query),
     get: async (projectId: ProjectId, id: Types['id']) => {
       return await ipcRenderer.invoke(`cim.${prefix}.get`, projectId, id);
     },

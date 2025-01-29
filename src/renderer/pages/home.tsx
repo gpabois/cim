@@ -1,10 +1,9 @@
 import { useAppDispatch, useCurrentProject } from "../hooks";
 import {newProject, openProject} from "../features/projects/projectsSlice";
 import { Option } from "../components/option";
-import { Link } from "react-router";
-import { Breadcrumbs } from "../components/breadcrumbs";
 import { FaDatabase } from "react-icons/fa6";
 import { Button } from "@renderer/components/button";
+import { Page } from "@renderer/components/page";
 
 export default function Home() {
   const dispatch = useAppDispatch();
@@ -14,14 +13,8 @@ export default function Home() {
 
     <Option value={maybeCurrentProject}
       onSome={(_) => <>
-        <Breadcrumbs>
-          <Link to="/">Home</Link>
-        </Breadcrumbs>
-        <div className="flex flex-col">
-          <Link to={`/aiots`}>AIOTS</Link>
-          <Link to={`/organismeDeControle`}>Organismes de contrôle</Link>
-          <Link to={`/contrôles`}>Contrôles inopinés</Link>
-        </div>
+        <Page heading="Tableau de bord">
+        </Page>
       </>}
       onNone={() => <div className="flex flex-col justify-center w-full gap-10 mt-10 items-center">
         <h2 className="text-lg font-bold text-center  leading-relaxed pb-1">Aucun projet n'est ouvert</h2>

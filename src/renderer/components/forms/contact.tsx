@@ -1,9 +1,9 @@
-import { Contact, contactSchema } from "@interface/model/contact";
+import { Contact, contactSchema } from "@shared/model/contact";
 import { Input } from "../form";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../button";
 import {BiFemaleSign, BiMaleSign, BiQuestionMark  } from "react-icons/bi"
-import { useYupValidationResolver } from "@app/hooks";
+import { useYupValidationResolver } from "@renderer/hooks";
 
 export interface ContactFormProps {
   defaultValues?: Contact,

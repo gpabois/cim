@@ -68,8 +68,6 @@ function createWindow() {
     },
   });
 
-  
-
   // and load the index.html of the app.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -99,6 +97,9 @@ app.whenReady().then(async () => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+
+  /// periodically save the project
+  setInterval(() => Project.flushAll(), 30*60*1000)
 
   const entry = new Entry();
   // enregistrer les points d'accès depuis le processus du renderer
