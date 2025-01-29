@@ -9,7 +9,7 @@ export class TemplatesController extends BaseController<"template"> {
   constructor() {
     super("template", {});
     this.expose({
-      generateAndSave: this.generateAndSave
+      generateAndSave: (...args) => this.generateAndSave(...args)
     })
   }
 

@@ -22,6 +22,14 @@ export function registerCrud<Types extends EntityTypes>(prefix: string): Crud<Ty
 
 /// Pont entre le renderer et le main process
 const cimBridge: ICimAPI = {
+  ui: {
+    async openWindow(url: string): Promise<void> {
+      await ipcRenderer.invoke('cim.ui.openWindow', url)
+    },
+    closeApp: () => ipcRenderer.invoke("cim.ui.closeApp"),
+    maximizeMainWindow: () => ipcRenderer.invoke("cim.ui.maximizeMainWindow"),
+    minimizeMainWindow: () => ipcRenderer.invoke("cim.ui.minimizeMainWindow")
+  },
   template: {
     generateAndSave<T>(project: ProjectId, name: string, data: T) {
       return ipcRenderer.invoke('cim.template.generateAndSave', project, name, data)
@@ -38,10 +46,10 @@ const cimBridge: ICimAPI = {
     ...registerCrud<AiotTypes>("aiots")
   },
   contrôles: {
-    ...registerCrud<ControleTypes>("controles")
+    ...registerCrud<ControleTypes>("contrôles")
   },
   organismesDeContrôle: {
-    ...registerCrud<OrganismeDeControleTypes>("organismesDeControle")
+    ...registerCrud<OrganismeDeControleTypes>("organismesDeContrôle")
   }
 };
 

@@ -15,11 +15,11 @@ export function DescriptionList(props: DescriptionListProps) {
       {props.children.description && <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">{props.children.description}</p>}
     </div>
     }
-    <div className="mt-2 border-t border-gray-100">
+    <div>
       <dl className="divide-y divide-gray-300">
         {props.children.fields.map(({heading, content, key}) => <div key={key} className="py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-        <dt className="text-sm/6 font-medium text-gray-900">{heading}</dt>
-        <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{content}</dd>
+        <dt className="text-sm/6 font-medium text-gray-900 px-2">{heading}</dt>
+        <dd className="text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">{content}</dd>
       </div>)}
       </dl>
     </div>

@@ -15,24 +15,30 @@ export interface RéceptionConforme {
   résultat: "choix-conforme",
   dateRéception: string,
 }
+
 export interface RéceptionNonConforme {
   résultat: "choix-non-conforme",
   dateRéception: string,
 }
+
 export interface AbsenceDeRéponse {
   résultat: "absence-de-réponse",
   commentaire: string
 }
 
 export type Selection = RéceptionConforme | RéceptionNonConforme | AbsenceDeRéponse;
+
 export interface Notification {
-  dateEnvoi: string
+  dateEnvoi?: string,
+  dateRéception?: string,
 }
+
 export interface Mandatement {
   dateEnvoi?: string,
   dateRéceptionCommande?: string,
   commentaires: string
 }
+
 export interface Exécution {
   dateExecution?: string
 }
@@ -42,6 +48,7 @@ export interface BaseControleFields {
   année: number,
   codeAiot: string,
   kind: "eau" | "air",
+  lienProcédureGUNenv?: string,
   notification?: Notification,
   sélection?: Selection,
   mandatement?: Mandatement,

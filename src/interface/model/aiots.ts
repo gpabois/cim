@@ -14,9 +14,11 @@ export interface AiotTypes extends EntityTypes<
 export interface AiotFields {
   nom: string,
   codeAiot: string,
+  lienGunEnv?: string,
   adresse: Adresse,
+  adresseAdministrative?: Adresse,
   équipe: Array<Contact>,  
-  serviceId: ServiceTypes['id']
+  serviceId?: ServiceTypes['id']
 }
 
 export const aiotFieldsSchema = yup.object({

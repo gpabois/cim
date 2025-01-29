@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux"
-import { RootState, AppDispatch } from "@app/store"
-import { isSome, None, Optional } from "@interface/option"
+import { RootState, AppDispatch } from "@renderer/store"
+import { isSome, None, Optional } from "@shared/option"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { scopedRegister } from "./utils"

@@ -13,8 +13,8 @@ export abstract class BaseController<Prefix extends keyof ICimAPI> {
 
   expose(exposed: ICimAPI[Prefix]) {
     this.exposed = {...this.exposed, ...exposed};
-
   }
+
   register(ipcMain: Electron.IpcMain) {
     Object.entries(this.exposed)
     .forEach(([name, handler]) => {
@@ -32,9 +32,9 @@ export abstract class BaseController<Prefix extends keyof ICimAPI> {
 
 export function exposeCrud<E extends EntityTypes>(entry: Crud<E>): Crud<E> {
   return {
-    create: entry.create,
-    update: entry.update,
-    list: entry.list,
-    get: entry.get
+    create: (...args) => entry.create(...args),
+    update: (...args) => entry.update(...args),
+    list: (...args) => entry.list(...args),
+    get: (...args) => entry.get(...args)
   }
 }

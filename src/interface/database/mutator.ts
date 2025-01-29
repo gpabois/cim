@@ -1,7 +1,7 @@
 import { any } from "itertools";
 import merge from "deepmerge";
 
-import { isSome } from "../option";
+import { isNone, isSome } from "../option";
 import { Mutator, Updator } from "./query";
 
 export function assertMutator<T>(value: Mutator<T> | Updator<T>): Mutator<T> {
@@ -42,6 +42,11 @@ export function modifyPath(path: string, modifier: (value: any) => any, entity: 
       if(Array.isArray(cursor)) {
         cursor = cursor[parseInt(segment)];
       } else {
+        /// crée un objet intermédiaire s'il n'existe pas
+        if(isNone(cursor[segment])){
+          cursor[segment] = {};
+        }
+        
         cursor = cursor[segment];
       }
     }

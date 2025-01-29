@@ -8,6 +8,12 @@ import { Crud } from "./types"
 
 /// Interface entre le renderer et le main (exposé par preload)
 export interface ICimAPI {
+  ui: {
+    openWindow(url: string): Promise<void>
+    closeApp(): Promise<void>
+    minimizeMainWindow(): Promise<void>
+    maximizeMainWindow(): Promise<void>
+  },
   template: {
     generateAndSave<T>(project: ProjectId, name: string, data: T): Promise<void>
   },

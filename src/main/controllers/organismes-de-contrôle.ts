@@ -34,13 +34,13 @@ export class OrganismesDeControleController extends BaseController<"organismesDe
   async list(projectId: ProjectId, query: SerChunkQuery<OrganismeDeControleTypes["fields"]>): Promise<OrganismeDeControleTypes["data"][]> {
     const project = Project.get(projectId)!;
     const services = project.db.getCollection("organismes-de-contrôle");
-    return Promise.all([...imap(services.findBy(query), partial(this.hydrate, [projectId]))])
+    return await Promise.all([...imap(services.findBy(query), fields => this.hydrate(projectId, fields))])
   }
 
   async get(projectId: ProjectId, id: string): Promise<Optional<OrganismeDeControleTypes["data"]>> {
     const project = Project.get(projectId)!;
     const services = project.db.getCollection("organismes-de-contrôle");
-    return mapSome(await services.findOneBy({id}), partial(this.hydrate, [projectId]));
+    return mapSome(services.findOneBy({id}), partial(this.hydrate, [projectId]));
   }
 
   async update(projectId: ProjectId, filter: Filter<OrganismeDeControleTypes["fields"]>, updator: Updator<OrganismeDeControleTypes["fields"]>): Promise<void> {

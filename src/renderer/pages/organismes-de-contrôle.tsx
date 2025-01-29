@@ -2,11 +2,13 @@ import api from "@renderer/api";
 import { AsyncResolved } from "@renderer/components/async";
 import { Breadcrumbs } from "@renderer/components/breadcrumbs";
 import { OrganismeDeControleCreationForm } from "@renderer/components/forms/organisme-de-contrôle";
+import { Page } from "@renderer/components/page";
 import { StackedList } from "@renderer/components/stacked-list";
 import { guardCurrentProject } from "@renderer/guards/project";
 import { useAsync } from "@renderer/hooks";
 import { defaultOrganismeDeControleCreation, OrganismeDeControleCreation } from "@shared/model/organismes-de-controle";
 import { useTranslation } from "react-i18next";
+import { BiAddToQueue } from "react-icons/bi";
 import { Link, useNavigate } from "react-router";
 
 export function CreateOrganismeDeControle() {
@@ -41,14 +43,14 @@ export function OrganismesDeControleList() {
 
   const state = useAsync(promiseFn, {projectId});
 
-  return <div className="p-2">
-    <Breadcrumbs>
-      <Link to="/">{t("Home")}</Link>
+  return <Page
+    heading="Liste des organismes de contrôle"
+    action={<Link to="/organismesDeControle/create"><BiAddToQueue/></Link>}
+    breadcrumbs={[
+      <Link to="/">{t("Home")}</Link>,
       <span>{t("OrganismesDeControle")}</span>
-    </Breadcrumbs>
-    <div className="mb-2">
-      <Link to="/organismesDeControle/create">Nouvel organisme de contrôle</Link>
-    </div>
+    ]}
+    >
     <AsyncResolved state={state}>
       {organismesDeControle =>
         <StackedList>
@@ -59,5 +61,5 @@ export function OrganismesDeControleList() {
         </StackedList>
       }
     </AsyncResolved>
-  </div>
+  </Page>
 }

@@ -93,13 +93,14 @@ export class Collection<T = any> implements BaseCollection {
     return first(this.findBy({ filter: predicate }))
   }
 
-  /// Insère un nouvel élément dans la collection
+  /// Insère un nouvel élément dans la collection.
   public insert(data: T) {
     if (!this.isLoaded()) this.load();
     this.items?.push(data);
     this.dirty = true;
   }
 
+  /// Met à jour des documents de la collection.
   public update(predicate_or_filter: Filter<T> | Predicate<T>, updator_or_mutator: Updator<T> | Mutator<T>) {
     const predicate = assertPredicate(predicate_or_filter);
     const mutator = assertMutator(updator_or_mutator);

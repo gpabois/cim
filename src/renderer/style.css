@@ -11,3 +11,22 @@
 .titlebar > * {
     -webkit-app-region: no-drag;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background-color: rgb(17 94 89)
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(13 148 136)
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.704 0.14 182.503)
+}

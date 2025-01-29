@@ -6,7 +6,7 @@ import { ConditionForm } from "@renderer/components/forms/condition";
 import { ConditionRejetAirCreationForm, UpdateEmissairesForm } from "@renderer/components/forms/contrôle";
 import { ParamètreForm } from "@renderer/components/forms/paramètre";
 import { Tabs } from "@renderer/components/tab";
-import { ControleAirContext, PointDeControleAirContext } from "@renderer/context/contrôle";
+import { ControleContext, PointDeControleAirContext } from "@renderer/context/contrôle";
 import { guardCurrentProject } from "@renderer/guards/project";
 import { UpdatorBuilder } from "@shared/database/query";
 import { Condition } from "@shared/model/condition";
@@ -27,7 +27,7 @@ export interface PointDeControleAirDetailProps {
 
 function RejetsList({rejets, kind}: {rejets: Array<ConditionRejetAir>, kind: ConditionAirKind}) {
   const {id: projectId} = guardCurrentProject();
-  const controle = useContext(ControleAirContext)!;
+  const controle = useContext(ControleContext)!;
   const point = useContext(PointDeControleAirContext)!;
 
   const deleteRejet = async (index: number) => {
@@ -97,7 +97,7 @@ function RejetsList({rejets, kind}: {rejets: Array<ConditionRejetAir>, kind: Con
 export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
   const {id: projectId} = guardCurrentProject();
   const point = props.point;
-  const controleCtx = useContext(ControleAirContext)!;
+  const controleCtx = useContext(ControleContext)!;
 
   type ModeKind = {
     kind: "nouveau", 

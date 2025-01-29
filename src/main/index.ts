@@ -12,10 +12,14 @@ import { ICimAPI } from '@shared/bridge';
 import { OrganismesDeControleController } from './controllers/organismes-de-contrôle';
 import { ControlesController } from './controllers/contrôles';
 import { TemplatesController } from './controllers/template';
+import { UiController } from './controllers/ui';
+import { None, Optional } from '@shared/option';
 
 export interface Hydrator<E extends EntityTypes> {
   hydrate(projectId: ProjectId, row: E["fields"]): Promise<E["data"]>
 }
+
+export let mainWindow: Optional<BrowserWindow> = None;
 
 export class Entry implements ICimAPI {
   public project: ProjectController;
@@ -24,6 +28,7 @@ export class Entry implements ICimAPI {
   public organismesDeContrôle: OrganismesDeControleController;
   public contrôles: ControlesController;
   public template: TemplatesController;
+  public ui: UiController;
   
   constructor() {
     this.project = new ProjectController();
@@ -33,6 +38,7 @@ export class Entry implements ICimAPI {
     this.contrôles = new ControlesController({
       aiots: this.aiots
     });
+    this.ui = new UiController();
     this.template = new TemplatesController();
   }
 
@@ -45,19 +51,24 @@ export class Entry implements ICimAPI {
     this.organismesDeContrôle.register(ipcMain);
     this.contrôles.register(ipcMain);
     this.template.register(ipcMain);
+    this.ui.register(ipcMain);
   }
 }
 
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     height: 600,
     width: 800,
+    frame: false,
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, "../preload/index.mjs"),
       sandbox: false
     },
   });
+
+  
 
   // and load the index.html of the app.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -65,6 +76,10 @@ function createWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'), { hash: "/" })
   }
+
+  mainWindow?.webContents.on('did-finish-load', function() {
+    mainWindow?.show();
+});
 }
 
 app.whenReady().then(() => {

@@ -13,6 +13,8 @@ import { UpdatorBuilder } from "@shared/database/query";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 import { Link, useNavigate } from "react-router";
+import { Page } from "@renderer/components/page";
+import { BiAddToQueue } from "react-icons/bi";
 
 /// Créée un nouveau service.
 export function CreateService() {
@@ -69,20 +71,21 @@ export function ServiceDetails() {
     await api.services.update(projectId, {id}, updator);
     await refresh();
   }
-
-  return <div className="p-2">
-    <AsyncResolved state={state}>
-      {maybeService =>
-        <OptionGuard value={maybeService} redirect="/404">
-          {service => <>
-            <Breadcrumbs>
-              <Link to="/">{t("Home")}</Link>
-              <Link to="/services">{t("Services")}</Link>
+  
+  return <AsyncResolved state={state}>
+    {maybeService =>
+      <OptionGuard value={maybeService} redirect="/404">
+        {service => <>
+          <Page
+            heading={service.nom}
+            breadcrumbs={[
+              <Link to="/">{t("Home")}</Link>,
+              <Link to="/services">{t("Services")}</Link>,
               <span>{service.nom}</span>
-            </Breadcrumbs>
+            ]}
+          >
             <DescriptionList>
               {{
-                title: service.nom,
                 fields: [{ 
                   key: "équipe", 
                   heading: "Equipe", 
@@ -95,12 +98,11 @@ export function ServiceDetails() {
                 }]
               }}
             </DescriptionList>
-
-          </>}
-        </OptionGuard>
-      }
-    </AsyncResolved>
-  </div>
+          </Page>
+        </>}
+      </OptionGuard>
+    }
+  </AsyncResolved>
 }
 
 
@@ -114,23 +116,23 @@ export function ServicesList() {
 
   const state = useAsync(promiseFn, {projectId});
 
-  return <div className="p-2">
-    <Breadcrumbs>
-      <Link to="/">{t("Home")}</Link>
-      <span>{t("Services")}</span>
-    </Breadcrumbs>
-    <div>
-      <Link to="/services/create">Nouveau service</Link>
-    </div>
+  return <Page 
+      heading="Liste des services de l'inspection"
+      breadcrumbs={[
+        <Link to="/">{t("Home")}</Link>,
+        <span>{t("Services")}</span>
+      ]}
+      action={<Link to="/services/create"><BiAddToQueue/></Link>}
+    >
     <AsyncResolved state={state}>
       {services => 
         <StackedList>
           {services.map(service => ({
             key: service.id,
-            content: <Link to={`/services/${service.id}`}>{service.id}</Link>
+            content: <Link to={`/services/${service.id}`}>{service.nom}</Link>
           }))}
         </StackedList>
       }
     </AsyncResolved>
-  </div>
+  </Page>
 }

@@ -7,7 +7,6 @@ import { Crud } from "@shared/types";
 import { Hydrator } from "..";
 import { imap } from "itertools";
 import { BaseController, exposeCrud } from ".";
-import { partial } from "ramda";
 
 export class AiotsController extends BaseController<"aiots"> implements Crud<AiotTypes>, Hydrator<AiotTypes> {
   constructor() {
@@ -33,8 +32,8 @@ export class AiotsController extends BaseController<"aiots"> implements Crud<Aio
   async list(projectId: ProjectId, query: SerChunkQuery<AiotFields>): Promise<AiotData[]> {
     const project = Project.get(projectId)!;
     const aiots = project.db.getCollection("aiots");
-
-    return Promise.all([
+    
+    return await Promise.all([
       ...imap(
         aiots.findBy(query),
         fields => this.hydrate(projectId, fields)

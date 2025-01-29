@@ -5,7 +5,6 @@ import { guardCurrentProject } from "@renderer/guards/project";
 import { useParams } from "react-router";
 import { groupby, imap, sorted } from "itertools";
 import { DescriptionList } from "@renderer/components/description-list";
-import { StackedList } from "@renderer/components/stacked-list";
 import { Breadcrumbs } from "@renderer/components/breadcrumbs";
 import { AiotCreation, AiotData, AiotTypes, defaultAiotCreation } from "@shared/model/aiots";
 import api from "@renderer/api";
@@ -15,6 +14,10 @@ import { EquipeDetails } from "@renderer/components/équipe";
 import { Contact } from "@shared/model/contact";
 import { useAsync } from "@renderer/hooks";
 import { AsyncPending, AsyncResolved } from "@renderer/components/async";
+import { GUNEnvIcon } from "@renderer/components/icons";
+import { Page } from "@renderer/components/page";
+
+export * from './list'
 
 /// Créée un nouvel AIOT.
 export function CreateAiot() {
@@ -68,7 +71,7 @@ export function AiotControles(props: AiotControles) {
       {controlesPerYear =>
         controlesPerYear.map(({ key: année, items: controles }) => <>
           <h3>{année}</h3>
-          {controles.map(controle => controle.kind)}
+          {controles.map(controle => <Link to={`/contrôles/${controle.id}`}>{controle.nom}</Link>)}
         </>)
       }
     </AsyncResolved>
@@ -105,7 +108,7 @@ export function AiotDetails() {
     await refresh();
   }
 
-  return <div className="p-2">
+  return <div>
     <AsyncPending state={state}>
     <Breadcrumbs>
         <Link to="/">Home</Link>
@@ -117,34 +120,51 @@ export function AiotDetails() {
       {maybeAiot =>
         <OptionGuard value={maybeAiot} redirect="/404">
           {aiot => <>
-            <Breadcrumbs>
-              <Link to="/">Home</Link>
-              <Link to="/aiots">AIOTS</Link>
-              <span>{aiot.nom}</span>
-            </Breadcrumbs>
-            <DescriptionList>
-              {{
-                title: aiot.nom,
-                description: aiot.codeAiot,
-                fields: [
-                  {
-                    key: "address", heading: "Adresse", content: <div className="flex flex-col">
-                      {aiot.adresse.lines.map((line) => <span key={line}>{line}</span>)}
-                      <span>{aiot.adresse.commune} ({aiot.adresse.codePostal})</span>
-                    </div>
-                  },
-                  { key: "équipe", heading: "Equipe", content: <EquipeDetails 
-                      équipe={aiot.équipe}
-                      addContactFn={addContact}
-                      removeContactFn={removeContact}
-                      updateContactFn={updateContact}
-                    /> 
-                  }
+            <Page 
+              breadcrumbs={
+                [
+                  <Link to="/">Home</Link>,
+                  <Link to="/aiots">AIOTS</Link>,
+                  <span>{aiot.nom}</span>
                 ]
-              }}
-            </DescriptionList>
-            <h2>Contrôles</h2>
-            <AiotControles aiot={aiot} />
+              }
+              heading={
+                <>
+                  <span>{aiot.nom}</span>
+                  <a className="cursor-pointer" onClick={() => api.ui.openWindow(aiot.lienGunEnv || `https://gunenv.din.developpement-durable.gouv.fr/aiot/?searchTerms=${aiot.codeAiot}`)}><GUNEnvIcon className="text-white"/></a>
+                </>
+              }
+              subheading={aiot.codeAiot}
+              tabs={[
+                {
+                  id: "infos-générales",
+                  label: "Informations générales",
+                  content: <DescriptionList>
+                  {{
+                    fields: [
+                      {
+                        key: "address", heading: "Adresse", content: <div className="flex flex-col">
+                          {aiot.adresse.lines.map((line) => <span key={line}>{line}</span>)}
+                          <span>{aiot.adresse.commune} ({aiot.adresse.codePostal})</span>
+                        </div>
+                      },
+                      { key: "équipe", heading: "Equipe", content: <EquipeDetails 
+                          équipe={aiot.équipe}
+                          addContactFn={addContact}
+                          removeContactFn={removeContact}
+                          updateContactFn={updateContact}
+                        /> 
+                      }
+                    ]
+                  }}
+                </DescriptionList>
+                }, {
+                  id: "contrôles",
+                  label: "Contrôles",
+                  content: <AiotControles aiot={aiot} />
+                }
+              ]}
+            />
           </>}
         </OptionGuard>
       }
@@ -152,34 +172,3 @@ export function AiotDetails() {
   </div>
 }
 
-export function AiotsList() {
-  const {id: projectId} = guardCurrentProject();
-
-  const promiseFn = async ({ projectId }) => {
-    const promise = api.aiots.list(projectId, {});
-    return await promise;
-  };
-
-  const state = useAsync(promiseFn, {projectId});
-
-  return <div className="p-2">
-    <Breadcrumbs>
-      <Link to="/">Home</Link>
-      <span>AIOTS</span>
-    </Breadcrumbs>
-    <div className="mb-2">
-      <Link to="/aiots/create">Nouvel AIOT</Link>
-    </div>
-    <AsyncResolved state={state}>
-      {aiots =>
-        <StackedList>
-          {aiots.map(aiot => ({
-            key: aiot.codeAiot,
-            content: <Link to={`/aiots/${aiot.codeAiot}`}>{aiot.nom}</Link>,
-            subcontent: <>{aiot.adresse.lines.join(', ')}, {aiot.adresse.commune}, {aiot.adresse.codePostal}</>
-          }))}
-        </StackedList>
-      } 
-    </AsyncResolved>
-  </div>
-}

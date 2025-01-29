@@ -10,8 +10,8 @@ export class ProjectController extends BaseController<"project"> {
     super("project", {});
     
     this.expose({
-      new: this.new,
-      open: this.open
+      new: (...args) => this.new(...args),
+      open: (...args) => this.open(...args)
     })
   }
 

@@ -8,7 +8,6 @@ import { Filter, SerChunkQuery, Updator } from "@shared/database/query";
 import { imap } from "itertools";
 import { Project } from "@shared/project";
 import { mapSome, Optional } from "@shared/option";
-import * as R from "ramda"
 import { AiotsController } from "./aiots";
 
 export interface ControlesControllerArgs {
@@ -48,10 +47,10 @@ export class ControlesController extends BaseController<"contrôles"> implements
   async list(projectId: ProjectId, query: SerChunkQuery<ControleTypes["fields"]>): Promise<ControleTypes["data"][]> {
     const project = Project.get(projectId)!;
     const services = project.db.getCollection("contrôles");
-    
-    return Promise.all([...imap(
+
+    return await Promise.all([...imap(
       services.findBy(query), 
-      R.partial(this.hydrate, [projectId])
+      fields => this.hydrate(projectId, fields)
     )])
   }
 
@@ -59,7 +58,10 @@ export class ControlesController extends BaseController<"contrôles"> implements
     const project = Project.get(projectId)!;
     const services = project.db.getCollection("contrôles");
     const fields = services.findOneBy({id});
-    return await mapSome(fields, R.partial(this.hydrate, [projectId]));
+    return await mapSome(
+      fields, 
+      fields => this.hydrate(projectId, fields)
+    );
   }
 
   async update(projectId: ProjectId, filter: Filter<ControleTypes["fields"]>, updator: Updator<ControleTypes["fields"]>): Promise<void> {

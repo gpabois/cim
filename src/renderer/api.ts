@@ -18,6 +18,20 @@ function registerCrud<
 const aiotsCrud = registerCrud<AiotTypes>('aiots');
 
 export default {
+  ui: {
+    openWindow(url: string) {
+      window.cim.ui.openWindow(url)
+    },
+    closeApp() {
+      window.cim.ui.closeApp()
+    },
+    minimizeMainWindow() {
+      window.cim.ui.minimizeMainWindow()
+    },
+    maximizeMainWindow() {
+      window.cim.ui.maximizeMainWindow()
+    }
+  },
   aiots: {
     async addContact(projectId: ProjectId, query: Filter<AiotTypes['fields']>, contact: Contact): Promise<void> {
       let updator = new UpdatorBuilder<AiotTypes['fields']>().add('équipe', contact).build();
@@ -34,8 +48,8 @@ export default {
     ...aiotsCrud
   },
   services: registerCrud<ServiceTypes>('services'),
-  organismesDeControle: registerCrud<OrganismeDeControleTypes>('organismesDeControle'),
-  controles: registerCrud<ControleTypes>('controles'),
+  organismesDeControle: registerCrud<OrganismeDeControleTypes>('organismesDeContrôle'),
+  controles: registerCrud<ControleTypes>('contrôles'),
   template: {
     async generateAndSave<T>(project: ProjectId, name: string, data: T): Promise<void> {
       await window.cim.template.generateAndSave(project, name, data)
