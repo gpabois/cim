@@ -3,6 +3,7 @@ import React, { useState } from "react";
 export interface Tab {id: string, label: React.ReactNode, content: React.ReactNode}
 
 export interface TabsProps {
+  onSelected?: (number) => void,
   selected?: number,
   children: Array<Tab>
   containerClassName?: string
@@ -22,7 +23,7 @@ export function Tabs(props: TabsProps) {
       <ul className="flex-row flex-wrap sm:flex space-x-2 items-center">
         {Array.from(props.children.entries()).map(([id, tab]) => <li key={id}>
           <a 
-            onClick={(_) => setCurrentTab(id)} 
+            onClick={(_) => {setCurrentTab(id); props.onSelected?.(id)}} 
             className={`inline-block p-4 rounded-t-lg border-b-2 sm:w-full ${currentTab === id ? selectedTabClassName : tablClassName}`}>
               {tab.label}
           </a>

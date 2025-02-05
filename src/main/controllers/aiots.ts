@@ -23,6 +23,7 @@ export class AiotsController extends BaseController<"aiots"> implements Crud<Aio
   async hydrate(_projectId: ProjectId, aiot: AiotFields): Promise<AiotData> {
     return {
       ...aiot,
+      adressePostale: aiot.adresseAdministrative || aiot.adresse,
       département: aiot.adresse.codePostal.slice(0, 2)
     }
   }

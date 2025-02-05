@@ -1,6 +1,6 @@
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { ConditionRejetAir, ControleAirCreation, PointDeControleAir } from "@shared/model/controle/air";
-import { Input, MultiInput, Select } from "../form";
+import { Input, MultiInput, RhfSelect } from "../form";
 import { SelectAiotId } from "./aiot";
 import { Button } from "../button";
 
@@ -93,7 +93,7 @@ export const ConditionRejetAirCreationForm = (props: ConditionRejetAirCreationFo
         <Input className="flex-1" label="Valeur" {...register("exigence.param.valeur")}></Input>
         <Input className="flex-1" label="Unité" {...register("exigence.param.unité")}></Input>
       </div>
-      <Select label="Type" {...register("exigence.kind")} transform={(v) => ({label: v, value: v})} options={["MAX", "MIN", "REF"]}></Select>
+      <RhfSelect label="Type" {...register("exigence.kind")} transform={(v) => ({label: v, value: v})} options={["MAX", "MIN", "REF"]}></RhfSelect>
       <Input type="submit" value="Enregistrer"/>
     </form>
   </FormProvider>

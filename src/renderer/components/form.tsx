@@ -1,11 +1,53 @@
-import {forwardRef, JSX} from 'react';
+import {forwardRef, JSX, useState} from 'react';
 import { Option } from './option';
 import ForeignSelect from 'react-select'
 import AsyncForeignSelect from 'react-select/async';
-import { Control, Controller, useController, UseControllerProps, useFieldArray, useFormContext, UseFormRegisterReturn } from 'react-hook-form';
+import { Controller, useController, UseControllerProps, useFieldArray, useForm, useFormContext, UseFormRegisterReturn } from 'react-hook-form';
 import { useScopedFormContext } from '@renderer/hooks';
 import { Button, ButtonProps, buttonSizes, buttonThemes } from './button';
-import { BiAddToQueue } from 'react-icons/bi';
+import { BiAddToQueue, BiEdit } from 'react-icons/bi';
+import { isSome, Optional } from '@shared/option';
+
+export type EditableFieldProps = JSX.IntrinsicElements['input'] & InputProps & {
+  defaultValues?: string
+  onSubmit?: (value: string) => void
+  children: React.ReactNode
+}
+
+export function EditableField(props: EditableFieldProps) {
+  const methods = useForm<{value: string}>({defaultValues: {value: props.defaultValues}});
+  type ModeKind = "edit" | "view";
+
+  const [mode, setMode] = useState<ModeKind>("view");
+
+  const submit = ({value}) => {
+    props.onSubmit?.(value);
+    setMode("view");
+  }
+
+  if(mode === "edit") {
+    const propsInput = {...props};
+    delete propsInput["children"];
+    delete propsInput["onSubmit"];
+    delete propsInput["defaultValues"];
+
+    return <form onSubmit={methods.handleSubmit(submit)}>
+      <Input {...propsInput} {...methods.register("value")} />
+      <div className="flex space-x-2">
+        <Input type="submit" value={"Enregistrer"}/>
+        <Button theme="danger" onClick={() => setMode("view")}>Annuler</Button>
+      </div>
+    </form>
+  } else {
+    return <div className='flex space-x-2'>
+      <div>
+        {props.children}
+      </div>
+      <Button theme='barebone' onClick={() => setMode("edit")}><BiEdit/></Button>
+    </div>
+  }
+}
+
 
 export interface AsyncSelectProps<T, V> {
   label?: string,
@@ -45,12 +87,41 @@ export function AsyncSelect<T, V>(props: AsyncSelectProps<T, V>) {
 </>
 }
 export interface SelectProps<V, T=V> {
+  name?: string,
   label?: string,
+  value?: T,
   options: Array<T>,
-  transform: (item: T) => {value: V, label: string}
+  transform: (item: T) => {value: V, label: string},
+  onChange?: (value: V) => void
 }
 
-export function Select<V, T=V>(props: UseControllerProps & SelectProps<V, T>) {
+export function Select<V, T=V>(props: SelectProps<V, T>) {
+  const onChange = (v: Optional<{value: V, label: string}>) => {
+    if(isSome(v)) {
+      props.onChange?.(v.value)
+    }
+  }
+  
+  return <div>
+  <Option 
+      value={props.label} 
+      onSome={(label) => <label htmlFor={props.name} className="mb-2 text-sm font-medium text-gray-900">
+          {label}
+      </label>}
+    />
+    <ForeignSelect<{label: string, value: V}>
+      classNames={{
+        container: (_) => 'rounded-md',
+        valueContainer: (_) => 'text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5'
+      }}
+      value={props.value && props.transform(props.value)}
+      onChange={onChange}
+      options={props.options.map(props.transform)}>
+  </ForeignSelect>
+  </div>
+}
+
+export function RhfSelect<V, T=V>(props: UseControllerProps & SelectProps<V, T>) {
   const { field } = useController(props);
   
   return <div>
@@ -78,10 +149,6 @@ export interface InputButton {
     onClick?: () => void
 }
 
-export interface EditableInputProps {
-  control: Control,
-  name: string
-}
 
 export interface InputProps {
     label?: string | React.ReactNode,
@@ -89,7 +156,6 @@ export interface InputProps {
     theme?: ButtonProps['theme'],
     size?: ButtonProps['size']
 }
-
 
 export const Input =  forwardRef<HTMLInputElement, Partial<UseFormRegisterReturn> & JSX.IntrinsicElements['input'] & InputProps>(function (props, ref) {
 

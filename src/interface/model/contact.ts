@@ -20,6 +20,12 @@ export const contactSchema = yup.object<Contact>({
   téléphone: yup.string()
 })
 
+export function contactToString(contact: Contact): string {
+  return (contact.genre === "homme" ? "M. " : "") 
+  + (contact.genre === "femme" ? "Mme. " : "") 
+  + (contact.prénom ? `${contact.prénom} ` : "")
+  + `${contact.nom} - ${contact.fonction}`
+}
 export function defaultContact() {
   return {
     nom: "",

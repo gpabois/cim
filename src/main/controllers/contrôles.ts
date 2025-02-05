@@ -44,7 +44,8 @@ export class ControlesController extends BaseController<"contrôles"> implements
     const controles = project.db.getCollection("contrôles");
     const insert: ControleTypes["fields"] = {
       id: `${snowflake.nextId()}`,
-      ...create
+      ...create,
+      points: []
     }
     controles.insert(insert);
     return insert.id;

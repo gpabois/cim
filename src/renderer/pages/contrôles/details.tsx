@@ -2,43 +2,36 @@ import api from "@renderer/api";
 import { AsyncPending, AsyncResolved } from "@renderer/components/async";
 import { PointDeControleAirCreationForm } from "@renderer/components/forms/contrôle";
 import { guardCurrentProject } from "@renderer/guards/project";
-import { useAsync } from "@renderer/hooks";
 import { None, Optional } from "@shared/option";
 import { useContext, useState } from "react";
-import { Link } from "react-router";
-import { BiAddToQueue, BiEdit, BiTrash } from "react-icons/bi";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
+import { BiAddToQueue, BiTrash } from "react-icons/bi";
 import { OptionGuard } from "@renderer/components/option";
 import { DescriptionList } from "@renderer/components/description-list";
-import { ControleAirFields, PointDeControleAir } from "@shared/model/controle/air";
 import { Button } from "@renderer/components/button";
 import { UpdatorBuilder } from "@shared/database/query";
 import { Accordeon } from "@renderer/components/accordeon";
 import { ControleContext } from "@renderer/context/contrôle";
 import { ControleSymbol } from "@renderer/components/contrôle";
 import { PointDeControleAirDetail } from "./air/details";
-import { useForm } from "react-hook-form";
-import { Input } from "@renderer/components/form";
+import { EditableField } from "@renderer/components/form";
 import { ControleFields } from "@shared/model/controle";
 import { GUNEnvIcon } from "@renderer/components/icons";
 import { Page } from "@renderer/components/page";
+import { EditableContact } from "@renderer/components/forms/contact";
+import { ControleAirFields, PointDeControleAir } from "@shared/model/controle/air";
+import { useAppDispatch, useAppSelector, useAsync } from "@renderer/hooks";
+import { setCurrentPoint, setCurrentTab } from "@renderer/features/controleViewSlice";
 
 function InfosGénérales() {
   const {id: projectId} = guardCurrentProject();
   const controle = useContext(ControleContext)!;
 
-  type ModeKind = "edit-lien-gunenv";
-  const [mode, setMode] = useState<Optional<ModeKind>>(None);
-
   const updateField = <Field extends keyof NonNullable<ControleFields>>(field: Field) => async (value: any) => {
-    const updator = new UpdatorBuilder().set(`${field}` as any, value[field]).build();
+    const updator = new UpdatorBuilder().set(`${field}` as any, value).build();
     await api.controles.update(projectId, {"id": controle.id}, updator);
-    setMode(None);
     controle.onUpdate();
   }
-
-  const updateLienProcédureGUNEnv = updateField("lienProcédureGUNenv");
-  const editLienProcédureGUNEnvForm = useForm<{lienProcédureGUNenv: string}>({defaultValues: controle});
 
   return <DescriptionList>
     {{
@@ -50,20 +43,14 @@ function InfosGénérales() {
             <GUNEnvIcon/>
           </div>,
           content: <>
-            {mode !== "edit-lien-gunenv" && <div className="flex items-center space-x-2">
+            <EditableField defaultValues={controle.lienProcédureGUNenv} onSubmit={updateField("lienProcédureGUNenv")}>
               {controle.lienProcédureGUNenv  ? <a onClick={(_) => api.ui.openWindow(controle.lienProcédureGUNenv!)}>{controle.lienProcédureGUNenv}</a> : "-"}
-              <Button theme="barebone" onClick={() => setMode("edit-lien-gunenv")}><BiEdit/></Button>
-            </div>}
-            {mode === "edit-lien-gunenv" && <>
-                <form className="flex space-x-2 items-center" onSubmit={editLienProcédureGUNEnvForm.handleSubmit(updateLienProcédureGUNEnv)}>
-                  <Input className="flex-1" {...editLienProcédureGUNEnvForm.register("lienProcédureGUNenv")}/>
-                  <div className="flex space-x-2">
-                    <Input type="submit" value={"Enregistrer"}/>
-                    <Button theme="danger" onClick={() => setMode(None)}>Annuler</Button>
-                  </div>
-                </form>
-              </>}
+            </EditableField>
           </>
+        }, {
+          key: "contact-exploitant",
+          heading: "Contact exploitant",
+          content: <EditableContact choices={controle.aiot.équipe} value={controle.contactExploitant} onSubmit={updateField("contactExploitant")}/>
         }
       ]
     }}
@@ -74,26 +61,17 @@ function Notification() {
   const {id: projectId} = guardCurrentProject();
   const controle = useContext(ControleContext)!;
 
-  type ModeKind = "edit-date-envoi" | "edit-date-réception";
-
-  const [mode, setMode] = useState<Optional<ModeKind>>(None);
-
-  const editDateEnvoiForm = useForm<{dateEnvoi: string}>({defaultValues: controle.notification});
-  const editDateReceptionForm = useForm<{dateRéception: string}>({defaultValues: controle.notification});
 
   const updateField = <Field extends keyof NonNullable<ControleFields["notification"]>>(field: Field) => async (value: any) => {
     const updator = new UpdatorBuilder().set(`notification.${field}` as any, value[field]).build();
     await api.controles.update(projectId, {"id": controle.id}, updator);
-    setMode(None);
     controle.onUpdate();
   }
 
-  const updateDateEnvoi = updateField("dateEnvoi");
-  const updateDateReception = updateField("dateRéception");
-
   /// Génère un courrier de notification
   const generateCourrierNotification = async () => {
-    await api.template.generateAndSave(projectId, "COURRIER_ANNONCE_CI_AIR.docx", controle);
+    const {onUpdate, ...data} = controle;
+    await api.template.generateAndSave(projectId, "COURRIER_ANNONCE_CI_AIR.docx", data);
   }
 
   return <>
@@ -110,40 +88,16 @@ function Notification() {
           {
             key: "dateEnvoi",
             heading: "Date d'envoi",
-            content: <>
-              {mode !== "edit-date-envoi" && <div className="flex items-center space-x-2">
-                {controle.notification?.dateEnvoi || "N/D"}
-                <Button theme="barebone" onClick={() => setMode("edit-date-envoi")}><BiEdit/></Button>
-              </div>}
-              {mode === "edit-date-envoi" && <>
-                <form className="flex space-x-2 items-center" onSubmit={editDateEnvoiForm.handleSubmit(updateDateEnvoi)}>
-                  <Input className="flex-1" type="date" {...editDateEnvoiForm.register("dateEnvoi")}/>
-                  <div className="flex space-x-2">
-                    <Input type="submit" value={"Enregistrer"}/>
-                    <Button theme="danger" onClick={() => setMode(None)}>Annuler</Button>
-                  </div>
-                </form>
-              </>}
-            </>
+            content: <EditableField type="date" onSubmit={updateField("dateEnvoi")} defaultValues={controle.notification?.dateEnvoi}>
+              {controle.notification?.dateEnvoi || "N/D"}
+            </EditableField>
           },
           {
             key: "dateRéception",
             heading: "Date de réception",
-            content: <>
-              {mode !== "edit-date-réception" && <div className="flex items-center space-x-2">
-                <span>{controle.notification?.dateRéception || "N/D"}</span>
-                <Button theme="barebone" onClick={() => setMode("edit-date-réception")}><BiEdit/></Button>
-              </div>}
-              {mode === "edit-date-envoi" && <>
-                <form className="flex space-x-2 items-center" onSubmit={editDateReceptionForm.handleSubmit(updateDateReception)}>
-                  <Input className="flex-1" type="date" {...editDateReceptionForm.register("dateRéception")}/>
-                  <div className="flex space-x-2">
-                    <Input type="submit" value={"Enregistrer"}/>
-                    <Button theme="danger" onClick={() => setMode(None)}>Annuler</Button>
-                  </div>
-                </form>
-              </>}
-            </>
+            content: <EditableField type="date" onSubmit={updateField("dateRéception")} defaultValues={controle.notification?.dateRéception}>
+              {controle.notification?.dateRéception || "N/D"}
+            </EditableField>
           },
         ]
       }}
@@ -178,6 +132,10 @@ export function ControleDetails() {
     refresh();
   }
 
+  const currentTab = useAppSelector((state) => state.controleView.currentTab);
+  const currentPoint = useAppSelector((state) => state.controleView.currrentPoint);
+  const dispatch = useAppDispatch();
+ 
   return <>
     <AsyncPending state={state}>
       <Page heading="..." breadcrumbs={[<Link to="/">Home</Link>, <Link to="/contrôles">Contrôles</Link>, <span>...</span>]}>
@@ -202,6 +160,8 @@ export function ControleDetails() {
                   {controle.lienProcédureGUNenv  && <a onClick={() => api.ui.openWindow(controle.lienProcédureGUNenv!)}><GUNEnvIcon/></a>}
                 </div>
               }
+              selectedTab={currentTab}
+              onSelectedTab={(tab) => dispatch(setCurrentTab(tab))}
               tabs={[
                 {
                   id: "infos-générales",
@@ -223,7 +183,7 @@ export function ControleDetails() {
                         />
                       }
                     </div>
-                    <Accordeon>
+                    <Accordeon selected={currentPoint} onSelected={(id) => dispatch(setCurrentPoint(id))}>
                       {controle.points.map((point, index) => ({
                         key: `${index}`,
                         title: <div className="flex w-full">

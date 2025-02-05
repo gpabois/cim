@@ -1,12 +1,11 @@
 import { OptionGuard } from "@renderer/components/option";
-import { Link, useNavigate } from "react-router";
-import { AiotCreationForm } from "@renderer/components/forms/aiot";
+import { Link } from "react-router";
 import { guardCurrentProject } from "@renderer/guards/project";
 import { useParams } from "react-router";
 import { groupby, imap, sorted } from "itertools";
 import { DescriptionList } from "@renderer/components/description-list";
 import { Breadcrumbs } from "@renderer/components/breadcrumbs";
-import { AiotCreation, AiotData, AiotTypes, defaultAiotCreation } from "@shared/model/aiots";
+import { AiotData, AiotFields, AiotTypes } from "@shared/model/aiots";
 import api from "@renderer/api";
 
 import { UpdatorBuilder } from "@shared/database/query";
@@ -16,31 +15,10 @@ import { useAsync } from "@renderer/hooks";
 import { AsyncPending, AsyncResolved } from "@renderer/components/async";
 import { GUNEnvIcon } from "@renderer/components/icons";
 import { Page } from "@renderer/components/page";
+import { EditableAdresse } from "@renderer/components/forms/adresse";
 
 export * from './list'
-
-/// Créée un nouvel AIOT.
-export function CreateAiot() {
-  const navigate = useNavigate();
-  const currentProject = guardCurrentProject();
-
-  const create = async (form: AiotCreation) => {
-    console.log(form);
-    await api.aiots.create(currentProject.id, form);
-    navigate(`/aiots/${form.codeAiot}`);
-  }
-
-  return <div className="p-2">
-    <Breadcrumbs>
-      <Link to="/">Home</Link>
-      <Link to="/aiots">AIOTS</Link>
-      <span>Nouveau</span>
-    </Breadcrumbs>
-    <div className="space-y-2">
-      <AiotCreationForm defaultValues={defaultAiotCreation()} onSubmit={create} />
-    </div>
-  </div>
-}
+export * from './create'
 
 export interface AiotControles {
   aiot: AiotData
@@ -90,6 +68,13 @@ export function AiotDetails() {
 
   const refresh = () => state.run({projectId, codeAiot});
 
+  const updateField = <Field extends keyof NonNullable<AiotFields>>(field: Field) => async (value: any) => {
+    const updator = new UpdatorBuilder().set(`${field}` as any, value).build();
+    await api.controles.update(projectId, {codeAiot}, updator);
+    refresh();
+  }
+    
+  
   const addContact = async (contact: Contact) => {
     const updator = new UpdatorBuilder<AiotTypes['fields']>().add("équipe", contact).build();
     await api.aiots.update(projectId, {codeAiot}, updator);
@@ -143,10 +128,11 @@ export function AiotDetails() {
                   {{
                     fields: [
                       {
-                        key: "address", heading: "Adresse", content: <div className="flex flex-col">
-                          {aiot.adresse.lines.map((line) => <span key={line}>{line}</span>)}
-                          <span>{aiot.adresse.commune} ({aiot.adresse.codePostal})</span>
-                        </div>
+                        key: "address", heading: "Adresse", content: 
+                          <EditableAdresse defaultValues={aiot.adresse} onSubmit={updateField("adresse")}/>
+                      }, {
+                        key: "addressAdm", heading: "Adresse administrative", content: 
+                          <EditableAdresse defaultValues={aiot.adresseAdministrative} onSubmit={updateField("adresseAdministrative")}/>
                       },
                       { key: "équipe", heading: "Equipe", content: <EquipeDetails 
                           équipe={aiot.équipe}

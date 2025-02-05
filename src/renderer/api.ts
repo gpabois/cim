@@ -52,7 +52,7 @@ export default {
   controles: registerCrud<ControleTypes>('contrôles'),
   template: {
     async generateAndSave<T>(project: ProjectId, name: string, data: T): Promise<void> {
-      await window.cim.template.generateAndSave(project, name, data)
+      await window.cim.template.generateAndSave(project, name, data);
     }
   }
 }

@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import projectReducer from './features/projects/projectsSlice';
+import controleViewReducer from './features/controleViewSlice';
 
 const store = configureStore({
     reducer: {
-        projects: projectReducer
+        projects: projectReducer,
+        controleView: controleViewReducer
     }
 });
 

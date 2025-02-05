@@ -30,6 +30,7 @@ export const aiotFieldsSchema = yup.object({
 
 export interface AiotData extends AiotFields {
   service?: ServiceTypes['data'],
+  adressePostale: Adresse,
   département: string
 }
 

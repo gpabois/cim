@@ -48,6 +48,7 @@ export interface BaseControleFields {
   année: number,
   codeAiot: string,
   kind: "eau" | "air",
+  contactExploitant?: Contact,
   lienProcédureGUNenv?: string,
   notification?: Notification,
   sélection?: Selection,
@@ -56,7 +57,6 @@ export interface BaseControleFields {
   référencesRéglementaires: Array<string>,
   périodeSouhaitée: string,
   préconisations: string,
-  contacts: Array<Contact>,
   inspection?: {
       serviceId: string,
       inspecteur?: Contact,
@@ -78,7 +78,6 @@ export function defaultBaseControleCreation(): BaseControleCreation {
     référencesRéglementaires: [],
     périodeSouhaitée: "",
     préconisations:"",
-    contacts: []
   }
 }
 

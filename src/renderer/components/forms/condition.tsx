@@ -1,5 +1,5 @@
 import { Condition } from "@shared/model/condition";
-import {  Input, Select } from "../form";
+import {  Input, RhfSelect } from "../form";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 export interface ConditionFormProps {
@@ -15,7 +15,7 @@ export function ConditionForm(props: ConditionFormProps) {
     <form onSubmit={methods.handleSubmit(submit)} className="flex flex-row items-center space-x-1">
       <Input label="Valeur" {...methods.register("param.valeur")}/>
       <Input label="Unité" {...methods.register("param.unité")}/>
-      <Select label="Type" {...methods.register("kind")} transform={(v) => ({label: v, value: v})} options={["MAX", "MIN", "REF"]}></Select>
+      <RhfSelect label="Type" {...methods.register("kind")} transform={(v) => ({label: v, value: v})} options={["MAX", "MIN", "REF"]}></RhfSelect>
       <Input type="submit" value="Enregistrer"/>
     </form>
   </FormProvider>

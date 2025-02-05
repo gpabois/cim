@@ -7,7 +7,9 @@ import { ConditionRejetAirCreationForm, UpdateEmissairesForm } from "@renderer/c
 import { ParamètreForm } from "@renderer/components/forms/paramètre";
 import { Tabs } from "@renderer/components/tab";
 import { ControleContext, PointDeControleAirContext } from "@renderer/context/contrôle";
+import { setCurrentPointTab } from "@renderer/features/controleViewSlice";
 import { guardCurrentProject } from "@renderer/guards/project";
+import { useAppDispatch, useAppSelector } from "@renderer/hooks";
 import { UpdatorBuilder } from "@shared/database/query";
 import { Condition } from "@shared/model/condition";
 import { ConditionRejetAir, PointDeControleAir } from "@shared/model/controle/air";
@@ -29,6 +31,7 @@ function RejetsList({rejets, kind}: {rejets: Array<ConditionRejetAir>, kind: Con
   const {id: projectId} = guardCurrentProject();
   const controle = useContext(ControleContext)!;
   const point = useContext(PointDeControleAirContext)!;
+ 
 
   const deleteRejet = async (index: number) => {
     const updator = new UpdatorBuilder().removeArrayElementAt(`points.${point.id}.${kind}`, index).build();
@@ -98,6 +101,8 @@ export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
   const {id: projectId} = guardCurrentProject();
   const point = props.point;
   const controleCtx = useContext(ControleContext)!;
+  const currentTab = useAppSelector((state) => state.controleView.currentTabPoint);
+  const dispatch = useAppDispatch();
 
   type ModeKind = {
     kind: "nouveau", 
@@ -141,7 +146,7 @@ export function PointDeControleAirDetail(props: PointDeControleAirDetailProps) {
           }]
         }}
       </DescriptionList>
-      <Tabs>
+      <Tabs selected={currentTab} onSelected={(tab) => dispatch(setCurrentPointTab(tab))}>
         {[
           {
             id: "conditions-rejet", 

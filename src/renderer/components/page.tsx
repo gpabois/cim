@@ -12,6 +12,8 @@ export interface PageProps {
   onSearch?: (search: string) => void,
   action?: React.ReactNode,
   tabs?: TabsProps["children"],
+  selectedTab?: number,
+  onSelectedTab?: (number) => void,
   children?: React.ReactNode
 }
 
@@ -44,7 +46,12 @@ export function Page(props: PageProps) {
       {props.action && <div>{props.action}</div>}
     </div>
   </div>
-  {props.tabs && <Tabs containerClassName="bg-teal-600" tabClassName="hover:border-teal-200 text-white hover:text-teal-200" selectedTabClassName="text-teal-200 border-teal-200">{props.tabs}</Tabs>}  
+  {props.tabs && <Tabs
+    selected={props.selectedTab}
+    onSelected={props.onSelectedTab}
+    containerClassName="bg-teal-600" 
+    tabClassName="hover:border-teal-200 text-white hover:text-teal-200" 
+    selectedTabClassName="text-teal-200 border-teal-200">{props.tabs}</Tabs>}  
   {props.children}
   </>
 }
