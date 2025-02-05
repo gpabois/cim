@@ -12,7 +12,7 @@ import { Button } from './components/button';
 import { IoClose, IoHome } from 'react-icons/io5';
 import api from './api';
 import { FaWindowMaximize, FaWindowMinimize } from 'react-icons/fa6';
-import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
+import { BiChevronLeft, BiChevronRight, BiSave } from 'react-icons/bi';
 
 export function Titlebar() {
   const maybeCurrentProject = useCurrentProject();
@@ -23,16 +23,22 @@ export function Titlebar() {
       <span>CIM v0.0.1</span>
       <Option
         value={maybeCurrentProject}
-        onSome={(_) => <div className='border-l pl-2 flex items-center space-x-2'>
-          <Link to={`/`} viewTransition><IoHome/></Link>
-          <Link to={`/aiots`} viewTransition>AIOTS</Link>
-          <Link to={`/organismes-de-contrôle`} viewTransition>Organismes</Link>
-          <Link to={`/contrôles`} viewTransition>Contrôles</Link>
-          <Link to={`/services`} viewTransition>Services</Link>
-        </div>}
+        onSome={(_) => <>
+          <div className='border-l pl-2 flex items-center space-x-2'>
+            <Link to={`/`} viewTransition><IoHome/></Link>
+            <Link to={`/aiots`} viewTransition>AIOTS</Link>
+            <Link to={`/organismes-de-contrôle`} viewTransition>Organismes</Link>
+            <Link to={`/contrôles`} viewTransition>Contrôles</Link>
+            <Link to={`/services`} viewTransition>Services</Link>
+          </div>
+          <div className='border-l flex items-center space-x-2'>
+            <Button theme="barebone" onClick={() => api.project.save(maybeCurrentProject!.id)}><BiSave/></Button>
+          </div>
+        </>}
       />
     </div>
     <div className='flex space-x'>
+      
       <Button onClick={() => navigate(-1)} theme='barebone'><BiChevronLeft/></Button>
       <Button onClick={() => navigate(1)} theme='barebone'><BiChevronRight/></Button>
       <Button onClick={() => api.ui.minimizeMainWindow()} theme='barebone'><FaWindowMinimize/></Button>

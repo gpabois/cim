@@ -11,7 +11,8 @@ export class ProjectController extends BaseController<"project"> {
     
     this.expose({
       new: (...args) => this.new(...args),
-      open: (...args) => this.open(...args)
+      open: (...args) => this.open(...args),
+      save: (...args) => this.save(...args),
     })
   }
 
@@ -43,5 +44,10 @@ export class ProjectController extends BaseController<"project"> {
     }
 
     return None;
+  }
+
+  async save(projectId: ProjectId) {
+    const project = Project.get(projectId)!;
+    project.flush();
   }
 }

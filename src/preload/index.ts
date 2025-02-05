@@ -42,6 +42,7 @@ const cimBridge: ICimAPI = {
   project: {
       open: (): Promise<ProjectId> => ipcRenderer.invoke('cim.project.open'),
       new: (): Promise<ProjectId> => ipcRenderer.invoke('cim.project.new'),
+      save: (projectId: ProjectId): Promise<void> => ipcRenderer.invoke("cim.project.save", projectId)
   },
   aiots: {
     ...registerCrud<AiotTypes>("aiots")

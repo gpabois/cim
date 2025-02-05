@@ -23,6 +23,7 @@ export interface ICimAPI {
   contrôles: Crud<ControleTypes>,
   project: {
       new: () => Promise<Optional<ProjectId>>,
-      open: () => Promise<Optional<ProjectId>>
+      open: () => Promise<Optional<ProjectId>>,
+      save: (projectId: ProjectId) => Promise<void>
   },
 }

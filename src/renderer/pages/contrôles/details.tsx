@@ -63,7 +63,7 @@ function Notification() {
 
 
   const updateField = <Field extends keyof NonNullable<ControleFields["notification"]>>(field: Field) => async (value: any) => {
-    const updator = new UpdatorBuilder().set(`notification.${field}` as any, value[field]).build();
+    const updator = new UpdatorBuilder().set(`notification.${field}` as any, value).build();
     await api.controles.update(projectId, {"id": controle.id}, updator);
     controle.onUpdate();
   }

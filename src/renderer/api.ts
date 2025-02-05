@@ -47,6 +47,11 @@ export default {
     },
     ...aiotsCrud
   },
+  project: {
+    async save(projectId: ProjectId) {
+      await window.cim.project.save(projectId);
+    }
+  },
   services: registerCrud<ServiceTypes>('services'),
   organismesDeControle: registerCrud<OrganismeDeControleTypes>('organismesDeContrôle'),
   controles: registerCrud<ControleTypes>('contrôles'),
